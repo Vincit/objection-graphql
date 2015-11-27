@@ -1,0 +1,7 @@
+node_modules
+.idea
+test-coverage
+examples/*/*.db
+examples/websql/objection.js
+*.iml
+*.DS_Store

@@ -1,0 +1,16 @@
+{
+  "name": "graphql-objection",
+  "version": "0.0.1",
+  "description": "Automatically generates GraphQL schema for objection.js models",
+  "main": "graphql-objection.js",
+  "scripts": {
+    "test": "istanbul --config=.istanbul.yml cover _mocha -- --slow 10 --timeout 5000 --reporter spec --recursive tests"
+  },
+  "keywords": [
+    "GraphQL",
+    "SQL",
+    "objection.js"
+  ],
+  "author": "Sami Koskimäki <sami.koskimaki@vincit.com>",
+  "license": "MIT"
+}
