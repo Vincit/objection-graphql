@@ -1,7 +1,7 @@
 # Very much work in progress
 
 If you still want to try this out, here is a standalone app for your pleasure. Just copy this into a file in
-the project root, and run it with a ES6 capable node version.
+the project root, and run it with a ES6 capable node version. Remember to run `npm install` in the root first.
 
 ```js
 const SchemaBuilder = require('./lib/SchemaBuilder');
