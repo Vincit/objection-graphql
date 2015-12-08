@@ -37,7 +37,7 @@ Promise.coroutine(function* () {
           firstName,
           age
         }
-        reviews(starsGt: 2, orderByDesc: stars) {
+        reviews(starsIn: [3, 4, 5], orderByDesc: stars) {
           title,
           text,
           stars,
