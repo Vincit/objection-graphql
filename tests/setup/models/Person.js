@@ -31,18 +31,18 @@ Person.jsonSchema = {
     firstName: {type: 'string', minLength: 1, maxLength: 255},
     lastName: {type: 'string', minLength: 1, maxLength: 255},
     gender: {type: 'string', enum: _.values(Person.Gender)},
-    age: {type: ['number', 'null']}
-
-    /*
-    address: {
-      type: 'object',
-      properties: {
-        street: {type: 'string'},
-        city: {type: 'string'},
-        zipCode: {type: 'string'}
+    age: {type: ['number', 'null']},
+    addresses: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          street: {type: 'string'},
+          city: {type: 'string'},
+          zipCode: {type: 'string'}
+        }
       }
     }
-    */
   }
 };
 

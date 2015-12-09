@@ -35,6 +35,7 @@ IntegrationTestSession.prototype.createTables = function () {
       table.string('lastName');
       table.enum('gender', _.values(models.Person.Gender));
       table.integer('age');
+      table.json('addresses', true);
       table.biginteger('parentId')
         .references('id')
         .inTable('Person')

@@ -3,6 +3,8 @@ var _ = require('lodash')
   , path = require('path')
   , expect = require('expect.js')
   , graphql = require('graphql').graphql
+  , GraphQLList = require('graphql').GraphQLList
+  , GraphQLObjectType = require('graphql').GraphQLObjectType
   , models = require('./setup/models')
   , SchemaBuilder = require('../lib/SchemaBuilder')
   , IntegrationTestSession = require('./setup/IntegrationTestSession');
@@ -37,11 +39,23 @@ describe('integration tests', function () {
         gender: 'Male',
         age: 73,
 
+        addresses: [{
+          street: 'Arnoldlane 12',
+          city: 'Arnoldova',
+          zipCode: '123456'
+        }],
+
         parent: {
           firstName: 'Gustav',
           lastName: 'Schwarzenegger',
           gender: 'Male',
-          age: 98
+          age: 98,
+
+          addresses: [{
+            street: 'Gustavroad 64',
+            city: 'Gustavia',
+            zipCode: '654321'
+          }]
         }
       }, {
         firstName: 'Michael',
@@ -158,37 +172,119 @@ describe('integration tests', function () {
     });
 
     it('`persons` field should have all properties defined in the Person model\'s jsonSchema', function () {
-      return graphql(schema, '{ persons { id, age, gender, firstName, lastName, parentId } }').then(function (res) {
+      return graphql(schema, '{ persons { id, age, gender, firstName, lastName, parentId, addresses { street, city, zipCode } } }').then(function (res) {
         expect(res.data.persons).to.eql([{
           id: 1,
           age: 98,
           firstName: 'Gustav',
           lastName: 'Schwarzenegger',
           gender: 'Male',
-          parentId: null
+          parentId: null,
+          addresses: [{
+            street: 'Gustavroad 64',
+            city: 'Gustavia',
+            zipCode: '654321'
+          }]
         }, {
           id: 2,
           age: 45,
           firstName: 'Michael',
           lastName: 'Biehn',
           gender: 'Male',
-          parentId: null
+          parentId: null,
+          addresses: null
         }, {
           id: 3,
           age: 20,
           firstName: 'Some',
           lastName: 'Random-Dudette',
           gender: 'Female',
-          parentId: null
+          parentId: null,
+          addresses: null
         }, {
           id: 4,
           age: 73,
           firstName: 'Arnold',
           lastName: 'Schwarzenegger',
           gender: 'Male',
-          parentId: 1
+          parentId: 1,
+          addresses: [{
+            street: 'Arnoldlane 12',
+            city: 'Arnoldova',
+            zipCode: '123456'
+          }]
         }]);
       });
+    });
+
+    describe('#argFactory', function () {
+
+      it('should register custom filter arguments', function () {
+        schema = new SchemaBuilder()
+          .model(session.models.Person)
+          .model(session.models.Movie)
+          .model(session.models.Review)
+          .argFactory(function (fields, modelClass) {
+            var args = {};
+
+            _.each(fields, function (field, propName) {
+              var columnName = modelClass.propertyNameToColumnName(propName);
+
+              if (field.type instanceof GraphQLObjectType || field.type instanceof GraphQLList) {
+                return;
+              }
+
+              args[propName + 'EqualsReverse'] = {
+                type: field.type,
+                query: function (query, value) {
+                  query.where(columnName, '=', value.split('').reverse().join(''));
+                }
+              };
+            });
+
+            return args;
+          })
+          .build();
+
+        return graphql(schema, '{ persons(firstNameEqualsReverse: "dlonrA", lastNameEqualsReverse: "reggenezrawhcS") { firstName } }', session.knex).then(function (res) {
+          expect(res.data.persons).to.eql([{
+            firstName: 'Arnold'
+          }]);
+        });
+      });
+
+    });
+
+    describe('#defaultArgNames', function () {
+
+      it('should change the names/postfixes of the default arguments', function () {
+        schema = new SchemaBuilder()
+          .model(session.models.Person)
+          .model(session.models.Movie)
+          .model(session.models.Review)
+          .defaultArgNames({
+            "eq": '_eq',
+            "gt": '_gt',
+            "gte": '_gte',
+            "lt": '_lt',
+            "lte": '_lte',
+            "like": '_like',
+            "likeNoCase": '_like_no_case',
+            "in": '_in',
+            "notIn": '_not_in',
+            "orderBy": 'order_by',
+            "orderByDesc": 'order_by_desc',
+            "range": "range"
+          })
+          .build();
+
+        return graphql(schema, '{ persons(firstName_eq: "Arnold", lastName_in: ["Schwarzenegger", "Random-Dudette"], order_by: age) { firstName } }', session.knex).then(function (res) {
+          expect(res.data.persons).to.eql([{
+            firstName: 'Arnold'
+          }]);
+        });
+      });
+
     });
 
     describe('relations', function () {
