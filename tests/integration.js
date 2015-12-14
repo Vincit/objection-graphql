@@ -476,6 +476,26 @@ describe('integration tests', function () {
         });
       });
 
+      it('adding \'IsNull: true\' after a property name should create an `is null` filter', function () {
+        return graphql(schema, '{ persons(parentIdIsNull: true) { firstName } }').then(function (res) {
+          expect(res.data.persons).to.eql([{
+            firstName: 'Gustav'
+          }, {
+            firstName: 'Michael'
+          }, {
+            firstName: 'Some'
+          }]);
+        });
+      });
+
+      it('adding \'IsNull: false\' after a property name should create an `not null` filter', function () {
+        return graphql(schema, '{ persons(parentIdIsNull: false) { firstName } }').then(function (res) {
+          expect(res.data.persons).to.eql([{
+            firstName: 'Arnold'
+          }]);
+        });
+      });
+
       it('orderBy should order by the given property', function () {
         return graphql(schema, '{ persons(orderBy: age) { firstName, age } }').then(function (res) {
           expect(res.data.persons).to.eql([{
@@ -587,6 +607,56 @@ describe('integration tests', function () {
 
       });
 
+    });
+
+  });
+
+  describe('single fields', function () {
+    var schema;
+
+    beforeEach(function () {
+      schema = new SchemaBuilder()
+        .model(session.models.Person)
+        .model(session.models.Movie)
+        .model(session.models.Review)
+        .build();
+    });
+
+    it('root should have `person` field', function () {
+      return graphql(schema, '{ person(id: 1) { firstName } }').then(function (res) {
+        expect(res.data.person).to.eql({
+          firstName: 'Gustav'
+        });
+      });
+    });
+
+    it('root should have `movie` field', function () {
+      return graphql(schema, '{ movie(nameLikeNoCase: "%terminator 2%") { name } }').then(function (res) {
+        expect(res.data.movie).to.eql({
+          name: 'Terminator 2: Judgment Day'
+        });
+      });
+    });
+
+    it('root should have `review` field', function () {
+      return graphql(schema, '{ review(id: 1) { title } }').then(function (res) {
+        expect(res.data.review).to.eql({
+          title: 'Great movie'
+        });
+      });
+    });
+
+    it('single fields should have all the same arguments and relations as the list views', function () {
+      return graphql(schema, '{ person(firstName: "Arnold") { movies(name: "The terminator") { name, actors(firstNameLikeNoCase : "%chae%") { firstName } } } }').then(function (res) {
+        expect(res.data.person).to.eql({
+          movies: [{
+            name: 'The terminator',
+            actors: [{
+              firstName: 'Michael'
+            }]
+          }]
+        });
+      });
     });
 
   });
