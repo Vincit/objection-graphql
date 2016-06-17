@@ -1,4 +1,6 @@
-# Automatic GraphQL API generator for objection.js
+# objection-graphql
+
+Automatic GraphQL API generator for objection.js
 
 ## Usage
 
