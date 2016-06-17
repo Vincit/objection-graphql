@@ -1,4 +1,47 @@
-# Very much work in progress
+# Automatic GraphQL API generator for objection.js
+
+## Usage
+
+All you need to do to get a rich GraphQL API for your objection.js models is this:
+
+```js
+const graphQlSchema = new SchemaBuilder()
+  .model(Person)
+  .model(Movie)
+  .model(Review)
+  .build();
+```
+
+After that you can use the created schema object to peform GraphQL queries:
+
+```js
+const result = yield graphql(graphQlSchema, `{
+  persons(ageGt: 40, gender: Male, lastNameLike: "%negg%", orderBy: age) {
+    id,
+    firstName,
+    movies(orderBy: releaseDate, nameLikeNoCase: "%erminato%") {
+      name,
+      actors(ageLte: 100, orderBy: firstName) {
+        id
+        firstName,
+        age
+      }
+      reviews(starsIn: [3, 4, 5], orderByDesc: stars) {
+        title,
+        text,
+        stars,
+        reviewer {
+          firstName
+        }
+      }
+    }
+  }
+}`, knex);
+
+console.log(result);
+```
+
+# This is still very much a work in progress
 
 If you still want to try this out, here is a standalone app for your pleasure. Just copy this into a file in
 the project root, and run it with a ES6 capable node version. Remember to run `npm install` in the root first.
