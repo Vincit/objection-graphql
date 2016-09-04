@@ -26,7 +26,7 @@ Review.jsonSchema = {
 
 Review.relationMappings = {
   reviewer: {
-    relation: Model.OneToOneRelation,
+    relation: Model.BelongsToOneRelation,
     modelClass: require('./Person'),
     join: {
       from: 'Review.reviewerId',
@@ -35,7 +35,7 @@ Review.relationMappings = {
   },
 
   movie: {
-    relation: Model.OneToOneRelation,
+    relation: Model.BelongsToOneRelation,
     modelClass: require('./Movie'),
     join: {
       from: 'Review.movieId',

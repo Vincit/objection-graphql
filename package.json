@@ -1,6 +1,6 @@
 {
   "name": "objection-graphql",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Automatically generates GraphQL schema for objection.js models",
   "main": "objection-graphql.js",
   "scripts": {
@@ -15,22 +15,25 @@
   ],
   "author": "Sami Koskimäki <sami.koskimaki@vincit.com>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/vincit/objection-graphql.js.git"
+  },
   "peerDependencies": {
-    "graphql": "^0.4.13",
-    "objection": "^0.3.0"
+    "graphql": "^0.7.0",
+    "objection": "> 0.5.0"
   },
   "dependencies": {
-    "bluebird": "^3.0.5",
-    "lodash": "^3.10.1"
+    "bluebird": "^3.4.6",
+    "lodash": "^4.15.0"
   },
   "devDependencies": {
-    "babel-preset-es2015": "^6.1.18",
     "expect.js": "^0.3.1",
-    "graphql": "^0.4.13",
-    "istanbul": "^0.4.1",
-    "knex": "^0.9.0",
-    "mocha": "^2.3.4",
-    "objection": "^0.3.0",
-    "sqlite3": "^3.1.1"
+    "graphql": "^0.7.0",
+    "istanbul": "^0.4.5",
+    "knex": "^0.11.10",
+    "mocha": "^3.0.2",
+    "objection": "next",
+    "sqlite3": "^3.1.4"
   }
 }

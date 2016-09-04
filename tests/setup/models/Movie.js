@@ -40,7 +40,7 @@ Movie.relationMappings = {
   },
 
   reviews: {
-    relation: Model.OneToManyRelation,
+    relation: Model.HasManyRelation,
     modelClass: require('./Review'),
     join: {
       from: 'Movie.id',

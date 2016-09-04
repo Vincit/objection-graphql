@@ -48,7 +48,7 @@ Person.jsonSchema = {
 
 Person.relationMappings = {
   reviews: {
-    relation: Model.OneToManyRelation,
+    relation: Model.HasManyRelation,
     modelClass: require('./Review'),
     join: {
       from: 'Person.id',
@@ -70,7 +70,7 @@ Person.relationMappings = {
   },
 
   parent: {
-    relation: Model.OneToOneRelation,
+    relation: Model.BelongsToOneRelation,
     modelClass: Person,
     join: {
       from: 'Person.parentId',
@@ -79,7 +79,7 @@ Person.relationMappings = {
   },
 
   children: {
-    relation: Model.OneToManyRelation,
+    relation: Model.HasManyRelation,
     modelClass: Person,
     join: {
       from: 'Person.id',

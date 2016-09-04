@@ -5,8 +5,8 @@ var _ = require('lodash')
   , graphql = require('graphql').graphql
   , GraphQLList = require('graphql').GraphQLList
   , GraphQLObjectType = require('graphql').GraphQLObjectType
+  , mainModule = require('../')
   , models = require('./setup/models')
-  , SchemaBuilder = require('../lib/SchemaBuilder')
   , IntegrationTestSession = require('./setup/IntegrationTestSession');
 
 describe('integration tests', function () {
@@ -16,6 +16,7 @@ describe('integration tests', function () {
     session = new IntegrationTestSession({
       knex: {
         client: 'sqlite3',
+        useNullAsDefault: true,
         connection: {
           filename: path.join(os.tmpdir(), 'graphql-objection.db')
         }
@@ -106,7 +107,8 @@ describe('integration tests', function () {
     var schema;
 
     beforeEach(function () {
-      schema = new SchemaBuilder()
+      schema = mainModule
+        .builder()
         .model(session.models.Person)
         .model(session.models.Movie)
         .model(session.models.Review)
@@ -116,7 +118,8 @@ describe('integration tests', function () {
     it('knex instance can be provided as the root value', function () {
       // Create a schema with unbound models. This test would fail if the
       // knex didn't get bound to the models inside the SchemaQueryBuilder.
-      schema = new SchemaBuilder()
+      schema = mainModule
+        .builder()
         .model(models.Person)
         .model(models.Movie)
         .model(models.Review)
@@ -150,7 +153,7 @@ describe('integration tests', function () {
     });
 
     it('root should have `movies` field', function () {
-      return graphql(schema, '{ movies { name } }').then(function (res) {
+      return graphql(schema, '{ movies(orderByDesc: name) { name } }').then(function (res) {
         expect(res.data.movies).to.eql([{
           name: 'The terminator'
         }, {
@@ -220,7 +223,8 @@ describe('integration tests', function () {
     describe('#argFactory', function () {
 
       it('should register custom filter arguments', function () {
-        schema = new SchemaBuilder()
+        schema = mainModule
+          .builder()
           .model(session.models.Person)
           .model(session.models.Movie)
           .model(session.models.Review)
@@ -258,7 +262,8 @@ describe('integration tests', function () {
     describe('#defaultArgNames', function () {
 
       it('should change the names/postfixes of the default arguments', function () {
-        schema = new SchemaBuilder()
+        schema = mainModule
+          .builder()
           .model(session.models.Person)
           .model(session.models.Movie)
           .model(session.models.Review)
@@ -614,8 +619,9 @@ describe('integration tests', function () {
   describe('single fields', function () {
     var schema;
 
-    beforeEach(function () {
-      schema = new SchemaBuilder()
+    before(function () {
+      schema = mainModule
+        .builder()
         .model(session.models.Person)
         .model(session.models.Movie)
         .model(session.models.Review)
@@ -646,7 +652,7 @@ describe('integration tests', function () {
       });
     });
 
-    it('single fields should have all the same arguments and relations as the list views', function () {
+    it('single fields should have all the same arguments and relations as the list fields', function () {
       return graphql(schema, '{ person(firstName: "Arnold") { movies(name: "The terminator") { name, actors(firstNameLikeNoCase : "%chae%") { firstName } } } }').then(function (res) {
         expect(res.data.person).to.eql({
           movies: [{

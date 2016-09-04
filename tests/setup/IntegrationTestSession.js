@@ -5,10 +5,11 @@ var _ = require('lodash')
   , models = require('./models');
 
 function IntegrationTestSession(config) {
-  this.knex = Knex(config.knex);
+  var knex = Knex(config.knex);
+  this.knex = knex;
   this.models = _.mapValues(models, function (modelClass) {
-    return modelClass.bindKnex(this.knex);
-  }, this);
+    return modelClass.bindKnex(knex);
+  });
 }
 
 IntegrationTestSession.prototype.createTables = function () {
