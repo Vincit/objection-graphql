@@ -61,7 +61,7 @@ a `where age <= 100` clause. In addition to the property filters there are some 
 
 # Getting started
 
-If you are already using objection.js the example in the [introduction](#introduction) is all you need to get started. 
+If you are already using objection.js the example in the [usage](#usage) section is all you need to get started. 
 If you are unfamiliar with objection.js you should try our [example project](https://github.com/Vincit/objection.js/tree/master/examples/express-es6).
 
 # Filters
