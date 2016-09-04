@@ -57,8 +57,7 @@ graphql(graphQlSchema, `{
 The example query used some of the many default filter arguments. For example the `nameLike: "%erminato%"`
 filter is mapped into a where clause `where name like '%erminato%'`. Similarily the `ageLte: 100` is mapped into
 a `where age <= 100` clause. In addition to the property filters there are some special arguments like `orderBy` and 
-`range`. Check out [TODO]() for a full list of filter arguments available by default. See [TODO]() on how to easily 
-add your own custom arguments.
+`range`. Check out [this table](#filters) for a full list of filter arguments available by default.
 
 # Getting started
 
