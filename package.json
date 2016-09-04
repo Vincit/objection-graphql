@@ -19,12 +19,17 @@
     "type": "git",
     "url": "git://github.com/vincit/objection-graphql.js.git"
   },
+  "files": [
+    "README.md",
+    "LICENSE",
+    "lib/*",
+    "objection-graphql.js"
+  ],
   "peerDependencies": {
     "graphql": "^0.7.0",
     "objection": "> 0.5.0"
   },
   "dependencies": {
-    "bluebird": "^3.4.6",
     "lodash": "^4.15.0"
   },
   "devDependencies": {
