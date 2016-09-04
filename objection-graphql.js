@@ -7,6 +7,3 @@ module.exports = {
     return new SchemaBuilder();
   }
 };
-
-
-
