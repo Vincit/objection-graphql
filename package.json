@@ -1,6 +1,6 @@
 {
   "name": "objection-graphql",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Automatically generates GraphQL schema for objection.js models",
   "main": "objection-graphql.js",
   "scripts": {
@@ -17,7 +17,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/vincit/objection-graphql.js.git"
+    "url": "git://github.com/vincit/objection-graphql.git"
   },
   "files": [
     "README.md",
