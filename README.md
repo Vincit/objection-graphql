@@ -49,7 +49,7 @@ graphql(graphQlSchema, `{
       }
     }
   }
-}`).then(function (result) {
+}`).then(result => {
   console.log(result.data.movies);
 });
 ```
@@ -99,13 +99,13 @@ const graphQlSchema = graphQlBuilder()
   .model(Movie)
   .model(Person)
   .model(Review)
-  .argFactory(function (fields, modelClass) {
-    var args = {};
+  .argFactory((fields, modelClass) => {
+    const args = {};
 
-    _.forOwn(fields, function (field, propName) {
+    _.forOwn(fields, (field, propName) => {
       // Skip all non primitive fields.
       if (field.type instanceof graphql.GraphQLObjectType 
-            || field.type instanceof graphql.GraphQLList) {
+          || field.type instanceof graphql.GraphQLList) {
         return;
       }
     
@@ -113,7 +113,8 @@ const graphQlSchema = graphQlBuilder()
         // For our filter the type of the value needs to be 
         // the same as the type of the field.
         type: field.type,
-        query: function (query, value) {
+        
+        query: (query, value) => {
           // query is an objection.js QueryBuilder instance.
           query.where(propName, '<>', value);
         }
