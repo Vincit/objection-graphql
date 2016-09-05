@@ -109,7 +109,7 @@ describe('integration tests', function () {
     beforeEach(function () {
       schema = mainModule
         .builder()
-        .model(session.models.Person)
+        .model(session.models.Person, {listFieldName: 'people'})
         .model(session.models.Movie)
         .model(session.models.Review)
         .build();
@@ -120,13 +120,13 @@ describe('integration tests', function () {
       // knex didn't get bound to the models inside the SchemaQueryBuilder.
       schema = mainModule
         .builder()
-        .model(models.Person)
+        .model(models.Person, {listFieldName: 'people'})
         .model(models.Movie)
         .model(models.Review)
         .build();
 
-      return graphql(schema, '{ persons { firstName } }', session.knex).then(function (res) {
-        expect(res.data.persons).to.eql([{
+      return graphql(schema, '{ people { firstName } }', session.knex).then(function (res) {
+        expect(res.data.people).to.eql([{
           firstName: 'Gustav'
         }, {
           firstName: 'Michael'
@@ -138,9 +138,9 @@ describe('integration tests', function () {
       });
     });
 
-    it('root should have `persons` field', function () {
-      return graphql(schema, '{ persons { firstName } }').then(function (res) {
-        expect(res.data.persons).to.eql([{
+    it('root should have `people` field', function () {
+      return graphql(schema, '{ people { firstName } }').then(function (res) {
+        expect(res.data.people).to.eql([{
           firstName: 'Gustav'
         }, {
           firstName: 'Michael'
@@ -174,9 +174,9 @@ describe('integration tests', function () {
       });
     });
 
-    it('`persons` field should have all properties defined in the Person model\'s jsonSchema', function () {
-      return graphql(schema, '{ persons { id, age, gender, firstName, lastName, parentId, addresses { street, city, zipCode } } }').then(function (res) {
-        expect(res.data.persons).to.eql([{
+    it('`people` field should have all properties defined in the Person model\'s jsonSchema', function () {
+      return graphql(schema, '{ people { id, age, gender, firstName, lastName, parentId, addresses { street, city, zipCode } } }').then(function (res) {
+        expect(res.data.people).to.eql([{
           id: 1,
           age: 98,
           firstName: 'Gustav',
@@ -225,7 +225,7 @@ describe('integration tests', function () {
       it('should register custom filter arguments', function () {
         schema = mainModule
           .builder()
-          .model(session.models.Person)
+          .model(session.models.Person, {listFieldName: 'people'})
           .model(session.models.Movie)
           .model(session.models.Review)
           .argFactory(function (fields, modelClass) {
@@ -250,8 +250,8 @@ describe('integration tests', function () {
           })
           .build();
 
-        return graphql(schema, '{ persons(firstNameEqualsReverse: "dlonrA", lastNameEqualsReverse: "reggenezrawhcS") { firstName } }', session.knex).then(function (res) {
-          expect(res.data.persons).to.eql([{
+        return graphql(schema, '{ people(firstNameEqualsReverse: "dlonrA", lastNameEqualsReverse: "reggenezrawhcS") { firstName } }', session.knex).then(function (res) {
+          expect(res.data.people).to.eql([{
             firstName: 'Arnold'
           }]);
         });
@@ -264,7 +264,7 @@ describe('integration tests', function () {
       it('should change the names/postfixes of the default arguments', function () {
         schema = mainModule
           .builder()
-          .model(session.models.Person)
+          .model(session.models.Person, {listFieldName: 'people'})
           .model(session.models.Movie)
           .model(session.models.Review)
           .defaultArgNames({
@@ -283,8 +283,8 @@ describe('integration tests', function () {
           })
           .build();
 
-        return graphql(schema, '{ persons(firstName_eq: "Arnold", lastName_in: ["Schwarzenegger", "Random-Dudette"], order_by: age) { firstName } }', session.knex).then(function (res) {
-          expect(res.data.persons).to.eql([{
+        return graphql(schema, '{ people(firstName_eq: "Arnold", lastName_in: ["Schwarzenegger", "Random-Dudette"], order_by: age) { firstName } }', session.knex).then(function (res) {
+          expect(res.data.people).to.eql([{
             firstName: 'Arnold'
           }]);
         });
@@ -294,9 +294,9 @@ describe('integration tests', function () {
 
     describe('relations', function () {
 
-      it('`persons` should have all the relations of a Person model', function () {
-        return graphql(schema, '{ persons { firstName, parent { firstName }, children { firstName }, movies { name }, reviews { title } } }').then(function (res) {
-          var arnold = _.find(res.data.persons, {firstName: 'Arnold'});
+      it('`people` should have all the relations of a Person model', function () {
+        return graphql(schema, '{ people { firstName, parent { firstName }, children { firstName }, movies { name }, reviews { title } } }').then(function (res) {
+          var arnold = _.find(res.data.people, {firstName: 'Arnold'});
 
           expect(arnold).to.eql({
             firstName: 'Arnold',
@@ -394,24 +394,24 @@ describe('integration tests', function () {
     describe('arguments', function () {
 
       it('each property name should work as a `==` filter', function () {
-        return graphql(schema, '{ persons(age: 73) { firstName } }').then(function (res) {
-          expect(res.data.persons).to.eql([{
+        return graphql(schema, '{ people(age: 73) { firstName } }').then(function (res) {
+          expect(res.data.people).to.eql([{
             firstName: 'Arnold'
           }]);
         });
       });
 
       it('adding \'Gt\' after a property name should create a `>` filter', function () {
-        return graphql(schema, '{ persons(ageGt: 73) { firstName } }').then(function (res) {
-          expect(res.data.persons).to.eql([{
+        return graphql(schema, '{ people(ageGt: 73) { firstName } }').then(function (res) {
+          expect(res.data.people).to.eql([{
             firstName: 'Gustav'
           }]);
         });
       });
 
       it('adding \'Gte\' after a property name should create a `>=` filter', function () {
-        return graphql(schema, '{ persons(ageGte: 73) { firstName } }').then(function (res) {
-          expect(res.data.persons).to.eql([{
+        return graphql(schema, '{ people(ageGte: 73) { firstName } }').then(function (res) {
+          expect(res.data.people).to.eql([{
             firstName: 'Gustav'
           }, {
             firstName: 'Arnold'
@@ -420,8 +420,8 @@ describe('integration tests', function () {
       });
 
       it('adding \'Lt\' after a property name should create a `<` filter', function () {
-        return graphql(schema, '{ persons(ageLt: 73) { firstName } }').then(function (res) {
-          expect(res.data.persons).to.eql([{
+        return graphql(schema, '{ people(ageLt: 73) { firstName } }').then(function (res) {
+          expect(res.data.people).to.eql([{
             firstName: 'Michael'
           }, {
             firstName: 'Some'
@@ -430,8 +430,8 @@ describe('integration tests', function () {
       });
 
       it('adding \'Lte\' after a property name should create a `<=` filter', function () {
-        return graphql(schema, '{ persons(ageLte: 73) { firstName } }').then(function (res) {
-          expect(res.data.persons).to.eql([{
+        return graphql(schema, '{ people(ageLte: 73) { firstName } }').then(function (res) {
+          expect(res.data.people).to.eql([{
             firstName: 'Michael'
           }, {
             firstName: 'Some'
@@ -442,8 +442,8 @@ describe('integration tests', function () {
       });
 
       it('adding \'Like\' after a property name should create a `like` filter', function () {
-        return graphql(schema, '{ persons(lastNameLike: "%egg%") { firstName } }').then(function (res) {
-          expect(res.data.persons).to.eql([{
+        return graphql(schema, '{ people(lastNameLike: "%egg%") { firstName } }').then(function (res) {
+          expect(res.data.people).to.eql([{
             firstName: 'Gustav'
           }, {
             firstName: 'Arnold'
@@ -452,8 +452,8 @@ describe('integration tests', function () {
       });
 
       it('adding \'LikeNoCase\' after a property name should create a case insensitive `like` filter', function () {
-        return graphql(schema, '{ persons(lastNameLikeNoCase: "sch%") { firstName } }').then(function (res) {
-          expect(res.data.persons).to.eql([{
+        return graphql(schema, '{ people(lastNameLikeNoCase: "sch%") { firstName } }').then(function (res) {
+          expect(res.data.people).to.eql([{
             firstName: 'Gustav'
           }, {
             firstName: 'Arnold'
@@ -462,8 +462,8 @@ describe('integration tests', function () {
       });
 
       it('adding \'In\' after a property name should create an `in` filter', function () {
-        return graphql(schema, '{ persons(ageIn: [45, 98]) { firstName } }').then(function (res) {
-          expect(res.data.persons).to.eql([{
+        return graphql(schema, '{ people(ageIn: [45, 98]) { firstName } }').then(function (res) {
+          expect(res.data.people).to.eql([{
             firstName: 'Gustav'
           }, {
             firstName: 'Michael'
@@ -472,8 +472,8 @@ describe('integration tests', function () {
       });
 
       it('adding \'NotIn\' after a property name should create an `not in` filter', function () {
-        return graphql(schema, '{ persons(ageNotIn: [45, 98]) { firstName } }').then(function (res) {
-          expect(res.data.persons).to.eql([{
+        return graphql(schema, '{ people(ageNotIn: [45, 98]) { firstName } }').then(function (res) {
+          expect(res.data.people).to.eql([{
             firstName: 'Some'
           }, {
             firstName: 'Arnold'
@@ -482,8 +482,8 @@ describe('integration tests', function () {
       });
 
       it('adding \'IsNull: true\' after a property name should create an `is null` filter', function () {
-        return graphql(schema, '{ persons(parentIdIsNull: true) { firstName } }').then(function (res) {
-          expect(res.data.persons).to.eql([{
+        return graphql(schema, '{ people(parentIdIsNull: true) { firstName } }').then(function (res) {
+          expect(res.data.people).to.eql([{
             firstName: 'Gustav'
           }, {
             firstName: 'Michael'
@@ -494,16 +494,16 @@ describe('integration tests', function () {
       });
 
       it('adding \'IsNull: false\' after a property name should create an `not null` filter', function () {
-        return graphql(schema, '{ persons(parentIdIsNull: false) { firstName } }').then(function (res) {
-          expect(res.data.persons).to.eql([{
+        return graphql(schema, '{ people(parentIdIsNull: false) { firstName } }').then(function (res) {
+          expect(res.data.people).to.eql([{
             firstName: 'Arnold'
           }]);
         });
       });
 
       it('orderBy should order by the given property', function () {
-        return graphql(schema, '{ persons(orderBy: age) { firstName, age } }').then(function (res) {
-          expect(res.data.persons).to.eql([{
+        return graphql(schema, '{ people(orderBy: age) { firstName, age } }').then(function (res) {
+          expect(res.data.people).to.eql([{
             firstName: 'Some',
             age: 20
           }, {
@@ -520,8 +520,8 @@ describe('integration tests', function () {
       });
 
       it('orderByDesc should order by the given property in descending order', function () {
-        return graphql(schema, '{ persons(orderByDesc: age) { firstName, age } }').then(function (res) {
-          expect(res.data.persons).to.eql([{
+        return graphql(schema, '{ people(orderByDesc: age) { firstName, age } }').then(function (res) {
+          expect(res.data.people).to.eql([{
             firstName: 'Gustav',
             age: 98
           }, {
@@ -538,8 +538,8 @@ describe('integration tests', function () {
       });
 
       it('range should select a range', function () {
-        return graphql(schema, '{ persons(range: [1, 2], orderBy: age) { firstName, age } }').then(function (res) {
-          expect(res.data.persons).to.eql([{
+        return graphql(schema, '{ people(range: [1, 2], orderBy: age) { firstName, age } }').then(function (res) {
+          expect(res.data.people).to.eql([{
             firstName: 'Michael',
             age: 45
           }, {
@@ -550,8 +550,8 @@ describe('integration tests', function () {
       });
 
       it('jsonSchema enums should be usable as GraphQL enums', function () {
-        return graphql(schema, '{ persons(gender: Male) { firstName } }').then(function (res) {
-          expect(res.data.persons).to.eql([{
+        return graphql(schema, '{ people(gender: Male) { firstName } }').then(function (res) {
+          expect(res.data.people).to.eql([{
             firstName: 'Gustav'
           }, {
             firstName: 'Michael'
@@ -622,7 +622,7 @@ describe('integration tests', function () {
     before(function () {
       schema = mainModule
         .builder()
-        .model(session.models.Person)
+        .model(session.models.Person, {listFieldName: 'people'})
         .model(session.models.Movie)
         .model(session.models.Review)
         .build();

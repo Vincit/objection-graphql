@@ -90,4 +90,78 @@ argument|action
 
 # Adding your own custom arguments
 
-TODO
+Here's an example how you could implement a `NotEq` filter for primitive values:
+
+```js
+const graphql = require('graphql');
+
+const graphQlSchema = graphQlBuilder()
+  .model(Movie)
+  .model(Person)
+  .model(Review)
+  .argFactory(function (fields, modelClass) {
+    var args = {};
+
+    _.forOwn(fields, function (field, propName) {
+      // Skip all non primitive fields.
+      if (field.type instanceof graphql.GraphQLObjectType || field.type instanceof graphql.GraphQLList) {
+        return;
+      }
+    
+      args[propName + 'NotEq'] = {
+        // The type of the value needs to be the same as the type of the field.
+        type: field.type,
+        query: function (query, value) {
+          // query is an objection.js QueryBuilder instance.
+          query.where(propName, '<>', value);
+        }
+      };
+    });
+
+    return args;
+  })
+  .build();
+```
+
+# Misc
+
+You can change the default filter suffixes and special filter names using the `defaultArgNames` method:
+
+```js
+const graphQlSchema = graphQlBuilder()
+  .model(Movie)
+  .model(Person)
+  .model(Review)
+  .defaultArgNames({
+    eq: '_eq',
+    gt: '_gt',
+    gte: '_gte',
+    lt: '_lt',
+    lte: '_lte',
+    like: '_like',
+    isNull: '_is_null',
+    likeNoCase: '_like_no_case',
+    in: '_in',
+    notIn: '_not_in',
+    orderBy: 'order_by',
+    orderByDesc: 'order_by_desc',
+    range: "range"
+  })
+  .build();
+```
+
+Now you would have `myProp_lt: value` instead of the default `myPropLt: value`.
+
+By default the model names are pluralized by adding an `s` to the end of the camelized table name. You set a custom
+plural form and singular forms for the root fields like so:
+
+```js
+const graphQlSchema = graphQlBuilder()
+  .model(Movie)
+  .model(Person, {
+    listFieldName: 'people',
+    fieldName: 'person'
+  })
+  .model(Review)
+```
+
