@@ -155,8 +155,8 @@ const graphQlSchema = graphQlBuilder()
 
 Now you would have `myProp_lt: value` instead of the default `myPropLt: value`.
 
-By default the model names are pluralized by adding an `s` to the end of the camelized table name. You set a custom
-plural form and singular forms for the root fields like so:
+By default the model names are pluralized by adding an `s` to the end of the camelized table name. You can set a custom
+plural and singular names for the root fields like so:
 
 ```js
 const graphQlSchema = graphQlBuilder()
