@@ -104,12 +104,14 @@ const graphQlSchema = graphQlBuilder()
 
     _.forOwn(fields, function (field, propName) {
       // Skip all non primitive fields.
-      if (field.type instanceof graphql.GraphQLObjectType || field.type instanceof graphql.GraphQLList) {
+      if (field.type instanceof graphql.GraphQLObjectType 
+            || field.type instanceof graphql.GraphQLList) {
         return;
       }
     
       args[propName + 'NotEq'] = {
-        // The type of the value needs to be the same as the type of the field.
+        // For our filter the type of the value needs to be 
+        // the same as the type of the field.
         type: field.type,
         query: function (query, value) {
           // query is an objection.js QueryBuilder instance.
