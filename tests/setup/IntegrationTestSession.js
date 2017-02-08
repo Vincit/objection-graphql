@@ -25,45 +25,45 @@ IntegrationTestSession.prototype.createTables = function () {
     return knex.schema.dropTableIfExists('Person_Movie');
   }).then(function () {
     return knex.schema.createTable('Movie', function (table) {
-      table.bigincrements('id').primary();
+      table.increments('id').primary();
       table.string('name');
       table.date('releaseDate');
     });
   }).then(function () {
     return knex.schema.createTable('Person', function (table) {
-      table.bigincrements('id').primary();
+      table.increments('id').primary();
       table.string('firstName');
       table.string('lastName');
       table.enum('gender', _.values(models.Person.Gender));
       table.integer('age');
       table.json('addresses', true);
-      table.biginteger('parentId')
+      table.integer('parentId')
         .references('id')
         .inTable('Person')
         .index();
     });
   }).then(function () {
     return knex.schema.createTable('Review', function (table) {
-      table.bigincrements('id').primary();
+      table.increments('id').primary();
       table.string('title');
       table.integer('stars');
       table.string('text');
-      table.biginteger('movieId')
+      table.integer('movieId')
         .references('id')
         .inTable('Movie')
         .index();
-      table.biginteger('reviewerId')
+      table.integer('reviewerId')
         .references('id')
         .inTable('Person')
         .index();
     });
   }).then(function () {
-    return knex.schema.createTable('Person_Movie', function (table){
-      table.biginteger('movieId')
+    return knex.schema.createTable('Person_Movie', function (table) {
+      table.integer('movieId')
         .references('id')
         .inTable('Movie')
         .index();
-      table.biginteger('personId')
+      table.integer('personId')
         .references('id')
         .inTable('Person')
         .index();

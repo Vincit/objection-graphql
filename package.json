@@ -1,6 +1,6 @@
 {
   "name": "objection-graphql",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Automatically generates GraphQL schema for objection.js models",
   "main": "objection-graphql.js",
   "scripts": {
@@ -26,7 +26,7 @@
     "objection-graphql.js"
   ],
   "peerDependencies": {
-    "graphql": "^0.7.0",
+    "graphql": "^0.9.0",
     "objection": "> 0.5.0"
   },
   "dependencies": {
@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "expect.js": "^0.3.1",
-    "graphql": "^0.7.0",
+    "graphql": "^0.9.1",
     "istanbul": "^0.4.5",
     "knex": "^0.11.10",
     "mocha": "^3.0.2",

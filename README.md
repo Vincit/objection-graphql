@@ -148,7 +148,7 @@ const graphQlSchema = graphQlBuilder()
     notIn: '_not_in',
     orderBy: 'order_by',
     orderByDesc: 'order_by_desc',
-    range: "range"
+    range: 'range'
   })
   .build();
 ```
