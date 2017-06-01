@@ -7,11 +7,11 @@ var Model = require('objection').Model;
  * @extends Model
  * @constructor
  */
-function Person() {
-  Model.apply(this, arguments);
+class Person extends Model {
+  // Model.apply(this, arguments);
 }
 
-Model.extend(Person);
+// Model.extend(Person);
 module.exports = Person;
 
 Person.tableName = 'Person';

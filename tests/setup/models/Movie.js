@@ -2,11 +2,11 @@
 
 var Model = require('objection').Model;
 
-function Movie() {
-  Model.apply(this, arguments);
+class Movie extends Model {
+
 }
 
-Model.extend(Movie);
+// Model.extend(Movie);
 module.exports = Movie;
 
 Movie.tableName = 'Movie';
