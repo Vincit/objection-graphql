@@ -2,11 +2,11 @@
 
 var Model = require('objection').Model;
 
-function Review() {
-  Model.apply(this, arguments);
+class Review extends Model {
+
 }
 
-Model.extend(Review);
+// Model.extend(Review);
 module.exports = Review;
 
 Review.tableName = 'Review';
