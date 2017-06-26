@@ -1,12 +1,13 @@
 {
   "name": "objection-graphql",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Automatically generates GraphQL schema for objection.js models",
   "main": "objection-graphql.js",
   "scripts": {
     "test": "istanbul --config=.istanbul.yml cover node_modules/mocha/bin/_mocha -- --slow 10 --timeout 5000 --reporter spec tests",
     "test-only": "mocha --slow 10 --timeout 5000 --reporter spec --recursive tests",
-    "test-bail": "mocha --slow 10 --timeout 5000 --reporter spec --recursive tests --bail"
+    "test-bail": "mocha --slow 10 --timeout 5000 --reporter spec --recursive tests --bail",
+    "test-opt": "mocha --slow 10 --timeout 5000 --reporter spec --recursive tests --bail --trace_opt --trace_deopt --trace_inlining"
   },
   "keywords": [
     "GraphQL",
@@ -19,6 +20,9 @@
     "type": "git",
     "url": "git://github.com/vincit/objection-graphql.git"
   },
+  "engines": {
+    "node": ">=4.0.0"
+  },
   "files": [
     "README.md",
     "LICENSE",
@@ -30,15 +34,15 @@
     "objection": "> 0.8.0"
   },
   "dependencies": {
-    "lodash": "^4.15.0"
+    "lodash": "^4.17.4"
   },
   "devDependencies": {
     "expect.js": "^0.3.1",
-    "graphql": "^0.10.1",
+    "graphql": "^0.10.3",
     "istanbul": "^0.4.5",
     "knex": "^0.13.0",
-    "mocha": "^3.0.2",
+    "mocha": "^3.4.2",
     "objection": "next",
-    "sqlite3": "^3.1.4"
+    "sqlite3": "^3.1.8"
   }
 }

@@ -128,6 +128,8 @@ const graphQlSchema = graphQlBuilder()
 
 # Misc
 
+## defaultArgNames
+
 You can change the default filter suffixes and special filter names using the `defaultArgNames` method:
 
 ```js
@@ -166,5 +168,36 @@ const graphQlSchema = graphQlBuilder()
     fieldName: 'person'
   })
   .model(Review)
+```
+
+## onQuery
+
+You can modify the root query by passing an object with `onQuery` method as the third argument for `graphql` method:
+
+```js
+const graphQlSchema = graphQlBuilder()
+  .model(Movie)
+  .model(Person)
+  .model(Review)
+  .build();
+
+// Execute a GraphQL query.
+expressApp.get('/graphql', (req, res, next) => {
+  graphql(graphQlSchema, req.query.graph, {
+    // builder is an objection.js query builder.
+    onQuery(builder) {
+      // You can for example store the the logged in user to builder context
+      // so that it can be accessed from model hooks.
+      builder.mergeContext({
+        user: req.user
+      });
+    }
+  }).then(result => {
+    res.send(result);
+  }).catch(err => {
+    next(err);
+  });
+})
+
 ```
 
