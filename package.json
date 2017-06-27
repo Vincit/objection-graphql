@@ -31,7 +31,7 @@
   ],
   "peerDependencies": {
     "graphql": "> 0.9.0",
-    "objection": "> 0.8.0"
+    "objection": "> 0.7.3"
   },
   "dependencies": {
     "lodash": "^4.17.4"
