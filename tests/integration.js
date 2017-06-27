@@ -1,3 +1,5 @@
+'use strict';
+
 const _ = require('lodash')
   , os = require('os')
   , path = require('path')
