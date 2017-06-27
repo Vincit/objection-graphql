@@ -181,7 +181,6 @@ const graphQlSchema = graphQlBuilder()
   .model(Review)
   .build();
 
-// Execute a GraphQL query.
 expressApp.get('/graphql', (req, res, next) => {
   graphql(graphQlSchema, req.query.graph, {
     // builder is an objection.js query builder.
@@ -191,13 +190,16 @@ expressApp.get('/graphql', (req, res, next) => {
       builder.mergeContext({
         user: req.user
       });
+      
+      // Or change the eager fetching algorithm.
+      builder.eagerAlgorithm(Model.JoinEagerAlgorithm);
     }
   }).then(result => {
     res.send(result);
   }).catch(err => {
     next(err);
   });
-})
+});
 
 ```
 
