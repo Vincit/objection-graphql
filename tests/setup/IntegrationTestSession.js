@@ -62,6 +62,7 @@ class IntegrationTestSession {
       });
     }).then(() => {
       return knex.schema.createTable('Person_Movie', (table) => {
+        table.increments('id').primary();
         table.integer('movieId')
           .references('id')
           .inTable('Movie')

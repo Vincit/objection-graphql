@@ -376,13 +376,16 @@ describe('integration tests', () => {
       });
 
       it('should be able to fetch nested relations', () => {
-        return graphql(schema, '{ movies { name, actors { firstName, movies { name } }, reviews { title, reviewer { firstName } } } }').then(res => {
+        return graphql(schema, '{ movies { id, name, actors { id, firstName, movies { name } }, reviews { id, title, reviewer { id, firstName } } } }').then(res => {
           const terminator = _.find(res.data.movies, {name: 'The terminator'});
 
           expect(terminator).to.eql({
+            id: 1,
             name: 'The terminator',
             actors: [{
+              id: 4,
               firstName: 'Arnold',
+
               movies: [{
                 name: 'The terminator'
               }, {
@@ -391,19 +394,28 @@ describe('integration tests', () => {
                 name: 'Predator'
               }]
             }, {
+              id: 2,
               firstName: 'Michael',
+
               movies: [{
                 name: 'The terminator'
               }]
             }],
+
             reviews: [{
+              id: 1,
               title: 'Great movie',
+
               reviewer: {
+                id: 3,
                 firstName: 'Some'
               }
             }, {
+              id: 2,
               title: 'Changed my mind',
+
               reviewer: {
+                id: 3,
                 firstName: 'Some'
               }
             }]
