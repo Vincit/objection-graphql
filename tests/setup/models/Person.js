@@ -26,6 +26,7 @@ class Person extends Model {
         parentId: {type: ['integer', 'null']},
         firstName: {type: 'string', minLength: 1, maxLength: 255},
         lastName: {type: 'string', minLength: 1, maxLength: 255},
+        fullName: { type: 'string' },
         gender: {type: 'string', enum: _.values(Person.Gender)},
         age: {type: ['number', 'null']},
         addresses: {
@@ -88,6 +89,14 @@ class Person extends Model {
         }
       }
     };
+  }
+
+  static get virtualAttributes() {
+    return ['fullName'];
+  }
+
+  fullName() {
+    return `${this.firstName} ${this.lastName}`;
   }
 }
 
