@@ -701,6 +701,49 @@ describe('integration tests', () => {
 
   });
 
+  describe('Queries with variables', () => {
+    let schema;
+
+    before(() => {
+      schema = mainModule
+        .builder()
+        .model(session.models.Person, {listFieldName: 'people'})
+        .model(session.models.Movie)
+        .model(session.models.Review)
+        .build();
+    });
+
+    it('Variables in queries should be replaced with values before querying', () => {
+      const query = `
+        query PersonQuery($id: Int, $movie_id: Int) {
+          person(id: $id) {
+            id
+            firstName
+            lastName
+            movies(id: $movie_id) {
+              name
+            }
+          }
+        }`;
+      const variableValues = {
+        id: 4,
+        movie_id: 1
+      };
+      return graphql(schema, query, null, null, variableValues).then(res => {
+        expect(res.data.person).to.eql({
+          id: 4,
+          firstName: 'Arnold',
+          lastName: 'Schwarzenegger',
+          movies: [
+            {
+              name: 'The terminator'
+            }
+          ]
+        });
+      });
+    });
+  });
+
   describe('Fragment Queries', () => {
     let schema;
 
