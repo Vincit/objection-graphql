@@ -242,6 +242,41 @@ describe('integration tests', () => {
       });
     });
 
+    describe('#selectFiltering', () => {
+      it('should select all columns for use in virtual attributes when selectFiltering is disabled', () => {
+        schema = mainModule
+          .builder()
+          .model(session.models.Person, {listFieldName: 'people'})
+          .model(session.models.Movie)
+          .model(session.models.Review)
+          .selectFiltering(false)
+          .build();
+        return graphql(schema, '{ people { id, firstName, lastName, fullName } }').then(res => {
+          expect(res.data.people).to.eql([{
+            id: 1,
+            firstName: 'Gustav',
+            lastName: 'Schwarzenegger',
+            fullName: 'Gustav Schwarzenegger'
+          }, {
+            id: 2,
+            firstName: 'Michael',
+            lastName: 'Biehn',
+            fullName: 'Michael Biehn'
+          }, {
+            id: 3,
+            firstName: 'Some',
+            lastName: 'Random-Dudette',
+            fullName: 'Some Random-Dudette'
+          }, {
+            id: 4,
+            firstName: 'Arnold',
+            lastName: 'Schwarzenegger',
+            fullName: 'Arnold Schwarzenegger'
+          }]);
+        });
+      });
+    });
+
     describe('#argFactory', () => {
 
       it('should register custom filter arguments', () => {
