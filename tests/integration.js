@@ -827,6 +827,46 @@ describe('integration tests', () => {
         });
       });
     });
+
+    it('Fragment spreads with multiple relations should be correctly resolved', () => {
+      const query = `
+        query PersonQuery {
+          person(id: 4) {
+            id
+            movies {
+              id
+            }
+            ...PersonFragment
+          }
+        }
+        fragment PersonFragment on Person {
+          movies {
+            id
+          }
+          parent {
+            id
+          }
+        }`;
+      return graphql(schema, query).then(res => {
+        expect(res.data.person).to.eql({
+          id: 4,
+          movies: [
+            {
+              id: 1,
+            },
+            {
+              id: 2,
+            },
+            {
+              id: 3,
+            }
+          ],
+          parent: {
+            id: 1,
+          }
+        });
+      });
+    });
   });
 
 });
