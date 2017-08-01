@@ -779,4 +779,54 @@ describe('integration tests', () => {
     });
   });
 
+  describe('Fragment Queries', () => {
+    let schema;
+
+    before(() => {
+      schema = mainModule
+        .builder()
+        .model(session.models.Person, {listFieldName: 'people'})
+        .model(session.models.Movie)
+        .model(session.models.Review)
+        .build();
+    });
+
+    it('Fragment spreads should be populated', () => {
+      const query = `
+        query PersonQuery {
+          ...PersonQueryFragment
+        }
+        fragment PersonQueryFragment on Query {
+          person(id: 2) {
+            ...PersonFragment
+          }
+        }
+        fragment PersonFragment on Person {
+          id
+          firstName
+          lastName
+          movies {
+            ...MovieFragment
+          }
+        }
+        fragment MovieFragment on Movie {
+          name
+          releaseDate
+        }`;
+      return graphql(schema, query).then(res => {
+        expect(res.data.person).to.eql({
+          id: 2,
+          firstName: 'Michael',
+          lastName: 'Biehn',
+          movies: [
+            {
+              name: 'The terminator',
+              releaseDate: '1984-10-26'
+            }
+          ]
+        });
+      });
+    });
+  });
+
 });
