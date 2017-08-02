@@ -844,6 +844,12 @@ describe('integration tests', () => {
             id
           }
           parent {
+            id,
+            ...ChildrenFragment
+          }
+        }
+        fragment ChildrenFragment on Person {
+          children {
             id
           }
         }`;
@@ -863,6 +869,12 @@ describe('integration tests', () => {
           ],
           parent: {
             id: 1,
+            
+            children: [
+              {
+                id: 4
+              }
+            ]
           }
         });
       });
