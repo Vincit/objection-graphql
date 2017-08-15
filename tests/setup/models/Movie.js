@@ -1,10 +1,19 @@
 'use strict';
 
+const _ = require('lodash');
 const Model = require('objection').Model;
 
 class Movie extends Model {
   static get tableName() {
     return 'Movie';
+  }
+
+  $parseDatabaseJson(json) {
+    return _.mapKeys(json, (value, key) => _.camelCase(key));
+  }
+
+  $formatDatabaseJson(json) {
+    return _.mapKeys(json, (value, key) => _.snakeCase(key));
   }
 
   static get jsonSchema() {

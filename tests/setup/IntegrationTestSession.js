@@ -30,7 +30,7 @@ class IntegrationTestSession {
       return knex.schema.createTable('Movie', (table) => {
         table.increments('id').primary();
         table.string('name');
-        table.date('releaseDate');
+        table.date('release_date');
       });
     }).then(() => {
       return knex.schema.createTable('Person', (table) => {
