@@ -31,7 +31,7 @@ describe('integration tests', () => {
   });
 
   before(() => {
-    return session.models.Movie.query().insertWithRelated([{
+    return session.models.Movie.query().insertGraph([{
       name: 'The terminator',
       releaseDate: '1984-10-26',
 
@@ -118,7 +118,7 @@ describe('integration tests', () => {
     });
 
     it('knex instance can be provided as the root value', () => {
-      // Create a schema with unbound models. This test would fail if the
+      // Create a schema with unbound models. This test would fail if
       // knex didn't get bound to the models inside the SchemaQueryBuilder.
       schema = mainModule
         .builder()
@@ -243,6 +243,7 @@ describe('integration tests', () => {
     });
 
     describe('#selectFiltering', () => {
+
       it('should select all columns for use in virtual attributes when selectFiltering is disabled', () => {
         schema = mainModule
           .builder()
@@ -251,6 +252,7 @@ describe('integration tests', () => {
           .model(session.models.Review)
           .selectFiltering(false)
           .build();
+
         return graphql(schema, '{ people { id, firstName, lastName, fullName } }').then(res => {
           expect(res.data.people).to.eql([{
             id: 1,
@@ -275,6 +277,7 @@ describe('integration tests', () => {
           }]);
         });
       });
+
     });
 
     describe('#argFactory', () => {
@@ -458,7 +461,84 @@ describe('integration tests', () => {
         });
       });
 
+      it('should be able to fetch nested relations using JoinEagerAlgorithm', () => {
+        return graphql(schema, `{ 
+          movies { 
+            id,
+            name,
+
+            actors {
+              id,
+              firstName,
+
+              movies {
+                name
+              }
+            },
+
+            reviews { 
+              id, 
+              title, 
+
+              reviewer { 
+                id, 
+                firstName 
+              } 
+            } 
+          } 
+        }`, {
+          onQuery(builder) {
+            builder.eagerAlgorithm(session.models.Person.JoinEagerAlgorithm);
+          }
+        }).then(res => {
+          const terminator = _.find(res.data.movies, {name: 'The terminator'});
+
+          expect(terminator).to.eql({
+            id: 1,
+            name: 'The terminator',
+            actors: [{
+              id: 4,
+              firstName: 'Arnold',
+
+              movies: [{
+                name: 'The terminator'
+              }, {
+                name: 'Terminator 2: Judgment Day'
+              }, {
+                name: 'Predator'
+              }]
+            }, {
+              id: 2,
+              firstName: 'Michael',
+
+              movies: [{
+                name: 'The terminator'
+              }]
+            }],
+
+            reviews: [{
+              id: 1,
+              title: 'Great movie',
+
+              reviewer: {
+                id: 3,
+                firstName: 'Some'
+              }
+            }, {
+              id: 2,
+              title: 'Changed my mind',
+
+              reviewer: {
+                id: 3,
+                firstName: 'Some'
+              }
+            }]
+          });
+        });
+      });
+
     });
+    
 
     describe('arguments', () => {
 
@@ -869,7 +949,7 @@ describe('integration tests', () => {
           ],
           parent: {
             id: 1,
-            
+
             children: [
               {
                 id: 4
