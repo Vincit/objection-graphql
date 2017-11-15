@@ -840,7 +840,7 @@ describe('integration tests', () => {
         .build();
     });
 
-    it('Variables in queries should be replaced with values before querying', () => {
+    it('variables in queries should be replaced with values before querying', () => {
       const query = `
         query PersonQuery($id: Int, $movie_id: Int) {
           person(id: $id) {
@@ -867,6 +867,28 @@ describe('integration tests', () => {
             }
           ]
         });
+      });
+    });
+
+    it('variables in arrays should be replaced with values before querying', () => {
+      const query = `
+        query PersonQuery($start: Int, $end: Int) {
+          people(range: [$start, $end], orderBy: id) {
+            id
+          }
+        }`;
+
+      const variableValues = {
+        start: 1,
+        end: 2
+      };
+
+      return graphql(schema, query, null, null, variableValues).then(res => {
+        expect(res.data.people).to.eql([{
+          id: 2
+        }, {
+          id: 3
+        }]);
       });
     });
   });
