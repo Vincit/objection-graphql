@@ -18,14 +18,12 @@ class IntegrationTestSession {
   createTables() {
     const knex = this.knex;
 
-    return knex.schema.dropTableIfExists('Movie').then(() => {
-      return knex.schema.dropTableIfExists('Person');
-    }).then(() => {
+    return knex.schema.dropTableIfExists('Person_Movie').then(() => {
       return knex.schema.dropTableIfExists('Review');
     }).then(() => {
-      return knex.schema.dropTableIfExists('Movie');
+      return knex.schema.dropTableIfExists('Person');
     }).then(() => {
-      return knex.schema.dropTableIfExists('Person_Movie');
+      return knex.schema.dropTableIfExists('Movie');
     }).then(() => {
       return knex.schema.createTable('Movie', (table) => {
         table.increments('id').primary();
@@ -40,10 +38,7 @@ class IntegrationTestSession {
         table.enum('gender', _.values(models.Person.Gender));
         table.integer('age');
         table.json('addresses', true);
-        table.integer('parentId')
-          .references('id')
-          .inTable('Person')
-          .index();
+        table.integer('parentId').index();
       });
     }).then(() => {
       return knex.schema.createTable('Review', (table) => {
@@ -51,26 +46,14 @@ class IntegrationTestSession {
         table.string('title');
         table.integer('stars');
         table.string('text');
-        table.integer('movieId')
-          .references('id')
-          .inTable('Movie')
-          .index();
-        table.integer('reviewerId')
-          .references('id')
-          .inTable('Person')
-          .index();
+        table.integer('movieId').index();
+        table.integer('reviewerId').index();
       });
     }).then(() => {
       return knex.schema.createTable('Person_Movie', (table) => {
         table.increments('id').primary();
-        table.integer('movieId')
-          .references('id')
-          .inTable('Movie')
-          .index();
-        table.integer('personId')
-          .references('id')
-          .inTable('Person')
-          .index();
+        table.integer('movieId').index();
+        table.integer('personId').index();
       });
     });
   }
