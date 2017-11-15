@@ -242,6 +242,18 @@ describe('integration tests', () => {
       });
     });
 
+    it('should work with the meta field `__typename`', () => {
+      return graphql(schema, '{ reviews { title, __typename } }').then(res => {
+        expect(res.data.reviews).to.eql([{
+          __typename: 'Review',
+          title: 'Great movie'
+        }, {
+          __typename: 'Review',
+          title: 'Changed my mind'
+        }]);
+      });
+    });
+
     describe('#selectFiltering', () => {
 
       it('should select all columns for use in virtual attributes when selectFiltering is disabled', () => {
@@ -462,8 +474,8 @@ describe('integration tests', () => {
       });
 
       it('should be able to fetch nested relations using JoinEagerAlgorithm', () => {
-        return graphql(schema, `{ 
-          movies { 
+        return graphql(schema, `{
+          movies {
             id,
             name,
 
@@ -476,16 +488,16 @@ describe('integration tests', () => {
               }
             },
 
-            reviews { 
-              id, 
-              title, 
+            reviews {
+              id,
+              title,
 
-              reviewer { 
-                id, 
-                firstName 
-              } 
-            } 
-          } 
+              reviewer {
+                id,
+                firstName
+              }
+            }
+          }
         }`, {
           onQuery(builder) {
             builder.eagerAlgorithm(session.models.Person.JoinEagerAlgorithm);
@@ -538,7 +550,7 @@ describe('integration tests', () => {
       });
 
     });
-    
+
 
     describe('arguments', () => {
 
