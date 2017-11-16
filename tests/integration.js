@@ -891,6 +891,31 @@ describe('integration tests', () => {
         }]);
       });
     });
+
+    it('enum variables should work', () => {
+      const query = `
+        query PersonQuery($order: PersonPropertiesEnum) {
+          people(orderByDesc: $order) {
+            id
+          }
+        }`;
+
+      const variableValues = {
+        order: 'id'
+      };
+
+      return graphql(schema, query, null, null, variableValues).then(res => {
+        expect(res.data.people).to.eql([{
+          id: 4
+        }, {
+          id: 3
+        }, {
+          id: 2
+        }, {
+          id: 1
+        }]);
+      });
+    });
   });
 
   describe('Fragment Queries', () => {
