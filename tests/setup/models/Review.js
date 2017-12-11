@@ -10,6 +10,7 @@ class Review extends Model {
   static get jsonSchema() {
     return {
       type: 'object',
+      required: ['reviewerId', 'movieId'],
 
       properties: {
         id: {type: 'integer'},

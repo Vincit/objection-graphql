@@ -5,6 +5,7 @@ const _ = require('lodash')
   , path = require('path')
   , expect = require('expect.js')
   , graphql = require('graphql').graphql
+  , printType = require('graphql').printType
   , GraphQLList = require('graphql').GraphQLList
   , GraphQLObjectType = require('graphql').GraphQLObjectType
   , mainModule = require('../')
@@ -1017,6 +1018,33 @@ describe('integration tests', () => {
           }
         });
       });
+    });
+  });
+
+  describe('Types', () => {
+    let schema;
+
+    before(() => {
+      schema = mainModule
+        .builder()
+        .model(session.models.Person, {listFieldName: 'people'})
+        .model(session.models.Movie)
+        .model(session.models.Review)
+        .build();
+    });
+
+    it('should make required fields required', () => {
+      const expectedSchema = `type Review {
+  id: Int
+  title: String
+  stars: Int
+  text: String
+  reviewerId: Int!
+  movieId: Int!
+  reviewer: Person!
+  movie: Movie!
+}`;
+      expect(expectedSchema).to.eql(printType(schema.getType("Review")));
     });
   });
 
