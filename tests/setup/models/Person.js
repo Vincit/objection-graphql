@@ -1,10 +1,8 @@
-'use strict';
-
+/* eslint-disable global-require */
 const _ = require('lodash');
-const Model = require('objection').Model;
+const { Model } = require('objection');
 
 class Person extends Model {
-
   static get tableName() {
     return 'Person';
   }
@@ -12,7 +10,7 @@ class Person extends Model {
   static get Gender() {
     return {
       Male: 'Male',
-      Female: 'Female'
+      Female: 'Female',
     };
   }
 
@@ -22,25 +20,25 @@ class Person extends Model {
       required: ['firstName', 'lastName'],
 
       properties: {
-        id: {type: 'integer'},
-        parentId: {type: ['integer', 'null']},
-        firstName: {type: 'string', minLength: 1, maxLength: 255},
-        lastName: {type: 'string', minLength: 1, maxLength: 255},
+        id: { type: 'integer' },
+        parentId: { type: ['integer', 'null'] },
+        firstName: { type: 'string', minLength: 1, maxLength: 255 },
+        lastName: { type: 'string', minLength: 1, maxLength: 255 },
         fullName: { type: 'string' },
-        gender: {type: 'string', enum: _.values(Person.Gender)},
-        age: {type: ['number', 'null']},
+        gender: { type: 'string', enum: _.values(Person.Gender) },
+        age: { type: ['number', 'null'] },
         addresses: {
           type: 'array',
           items: {
             type: 'object',
             properties: {
-              street: {type: 'string'},
-              city: {type: 'string'},
-              zipCode: {type: 'string'}
-            }
-          }
-        }
-      }
+              street: { type: 'string' },
+              city: { type: 'string' },
+              zipCode: { type: 'string' },
+            },
+          },
+        },
+      },
     };
   }
 
@@ -54,8 +52,8 @@ class Person extends Model {
         modelClass: Review,
         join: {
           from: 'Person.id',
-          to: 'Review.reviewerId'
-        }
+          to: 'Review.reviewerId',
+        },
       },
 
       movies: {
@@ -65,10 +63,10 @@ class Person extends Model {
           from: 'Person.id',
           through: {
             from: 'Person_Movie.personId',
-            to: 'Person_Movie.movieId'
+            to: 'Person_Movie.movieId',
           },
-          to: 'Movie.id'
-        }
+          to: 'Movie.id',
+        },
       },
 
       parent: {
@@ -76,8 +74,8 @@ class Person extends Model {
         modelClass: Person,
         join: {
           from: 'Person.parentId',
-          to: 'Person.id'
-        }
+          to: 'Person.id',
+        },
       },
 
       children: {
@@ -85,9 +83,9 @@ class Person extends Model {
         modelClass: Person,
         join: {
           from: 'Person.id',
-          to: 'Person.parentId'
-        }
-      }
+          to: 'Person.parentId',
+        },
+      },
     };
   }
 

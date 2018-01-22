@@ -1,9 +1,9 @@
-'use strict';
 
-var SchemaBuilder = require('./lib/SchemaBuilder');
+
+const SchemaBuilder = require('./lib/SchemaBuilder');
 
 module.exports = {
-  builder: function () {
+  builder() {
     return new SchemaBuilder();
-  }
+  },
 };

@@ -1,6 +1,5 @@
-'use strict';
-
-const Model = require('objection').Model;
+/* eslint-disable global-require */
+const { Model } = require('objection');
 
 class Review extends Model {
   static get tableName() {
@@ -12,13 +11,13 @@ class Review extends Model {
       type: 'object',
 
       properties: {
-        id: {type: 'integer'},
-        title: {type: 'string', minLength: 1, maxLength: 255},
-        stars: {type: 'integer'},
-        text: {type: 'string'},
-        reviewerId: {type: 'integer'},
-        movieId: {type: 'integer'}
-      }
+        id: { type: 'integer' },
+        title: { type: 'string', minLength: 1, maxLength: 255 },
+        stars: { type: 'integer' },
+        text: { type: 'string' },
+        reviewerId: { type: 'integer' },
+        movieId: { type: 'integer' },
+      },
     };
   }
 
@@ -32,8 +31,8 @@ class Review extends Model {
         modelClass: Person,
         join: {
           from: 'Review.reviewerId',
-          to: 'Person.id'
-        }
+          to: 'Person.id',
+        },
       },
 
       movie: {
@@ -41,9 +40,9 @@ class Review extends Model {
         modelClass: Movie,
         join: {
           from: 'Review.movieId',
-          to: 'Movie.id'
-        }
-      }
+          to: 'Movie.id',
+        },
+      },
     };
   }
 }
