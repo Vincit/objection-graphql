@@ -126,6 +126,78 @@ const graphQlSchema = graphQlBuilder()
   .build();
 ```
 
+# Extending your schema with mutations
+
+Often you need to provide mutations in your GraphQL schema. At the same time mutations can be quite opinionated with side effects and complex business logic. 
+Therefore we provide a method `extendWithMutations` which allows you to extend the generated query schema with mutations:
+
+```js
+
+//...
+const personType = new GraphQLObjectType({
+    name: 'PersonType',
+    description: 'Use this object to create new person',
+    fields: () => ({
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: 'First Name',
+      },
+      firstName: {
+        type: new GraphQLNonNull(GraphQLString),
+        description: 'First Name',
+      },
+      lastName: {
+        type: new GraphQLNonNull(GraphQLString),
+        description: 'Last Name',
+      },
+    }),
+});
+
+const createPersonInputType = new GraphQLInputObjectType({
+    name: 'CreatePersonType',
+    description: 'Use this object to create new person',
+    fields: () => ({
+      firstName: {
+        type: new GraphQLNonNull(GraphQLString),
+        description: 'First Name',
+      },
+      lastName: {
+        type: new GraphQLNonNull(GraphQLString),
+        description: 'Last Name',
+      },
+    }),
+});
+    
+const mutationType = new GraphQLObjectType({
+     name: 'RootMutationType',
+     description: 'Domain API actions',
+     fields: () => ({
+       createPerson: {
+         description: 'Creates a new person',
+         type: personType,
+         args: {
+           input: { type: new GraphQLNonNull(createPersonInputType) },
+         },
+         resolve: (root, inputPerson) => {
+           const { firstName, lastName } = inputPerson.input;
+           return {
+              id: 1,
+              firstName,
+              lastName,
+           };
+         },
+       },
+    }),
+});
+
+schema = mainModule
+      .builder()
+      .model(session.models.Person)
+      .extendWithMutations(mutationType)
+      .build();    
+```
+   
+
 # Misc
 
 ## defaultArgNames
