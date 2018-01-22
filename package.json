@@ -7,7 +7,8 @@
     "test": "istanbul --config=.istanbul.yml cover node_modules/mocha/bin/_mocha -- --slow 10 --timeout 5000 --reporter spec tests",
     "test-only": "mocha --slow 10 --timeout 5000 --reporter spec --recursive tests",
     "test-bail": "mocha --slow 10 --timeout 5000 --reporter spec --recursive tests --bail",
-    "test-opt": "mocha --slow 10 --timeout 5000 --reporter spec --recursive tests --bail --trace_opt --trace_deopt --trace_inlining"
+    "test-opt": "mocha --slow 10 --timeout 5000 --reporter spec --recursive tests --bail --trace_opt --trace_deopt --trace_inlining",
+    "lint:js": "eslint . --fix"
   },
   "keywords": [
     "GraphQL",
@@ -37,6 +38,9 @@
     "lodash": "^4.17.4"
   },
   "devDependencies": {
+    "eslint": "^4.16.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.8.0",
     "expect.js": "^0.3.1",
     "graphql": "^0.10.3",
     "istanbul": "^0.4.5",

@@ -1,7 +1,8 @@
-'use strict';
+/* eslint-disable global-require */
+
 
 const _ = require('lodash');
-const Model = require('objection').Model;
+const { Model } = require('objection');
 
 class Movie extends Model {
   static get tableName() {
@@ -22,20 +23,22 @@ class Movie extends Model {
       required: ['name'],
 
       properties: {
-        id: {type: 'integer'},
-        name: {type: 'string', minLength: 1, maxLength: 255},
-        releaseDate: {anyOf: [
-          {type: 'string', format: 'date'},
-          {type: 'null'}
-        ]}
-      }
+        id: { type: 'integer' },
+        name: { type: 'string', minLength: 1, maxLength: 255 },
+        releaseDate: {
+          anyOf: [
+            { type: 'string', format: 'date' },
+            { type: 'null' },
+          ],
+        },
+      },
     };
   }
 
   static get relationMappings() {
     const Person = require('./Person');
     const Review = require('./Review');
-    
+
     return {
       actors: {
         relation: Model.ManyToManyRelation,
@@ -44,10 +47,10 @@ class Movie extends Model {
           from: 'Movie.id',
           through: {
             from: 'Person_Movie.movieId',
-            to: 'Person_Movie.personId'
+            to: 'Person_Movie.personId',
           },
-          to: 'Person.id'
-        }
+          to: 'Person.id',
+        },
       },
 
       reviews: {
@@ -55,9 +58,9 @@ class Movie extends Model {
         modelClass: Review,
         join: {
           from: 'Movie.id',
-          to: 'Review.movieId'
-        }
-      }
+          to: 'Review.movieId',
+        },
+      },
     };
   }
 }
