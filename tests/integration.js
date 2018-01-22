@@ -2,7 +2,11 @@ const _ = require('lodash');
 const os = require('os');
 const path = require('path');
 const expect = require('expect.js');
-const { graphql, GraphQLList, GraphQLObjectType } = require('graphql');
+const {
+  graphql, GraphQLList, GraphQLObjectType,
+  GraphQLInputObjectType, GraphQLNonNull,
+  GraphQLInt, GraphQLString,
+} = require('graphql');
 const mainModule = require('../');
 const models = require('./setup/models');
 const IntegrationTestSession = require('./setup/IntegrationTestSession');
@@ -928,6 +932,91 @@ describe('integration tests', () => {
             ],
           },
         });
+      });
+    });
+  });
+
+  describe('Schema with mutations', () => {
+    let schema;
+
+    const personType = new GraphQLObjectType({
+      name: 'PersonType',
+      description: 'Use this object to create new person',
+      fields: () => ({
+        id: {
+          type: new GraphQLNonNull(GraphQLInt),
+          description: 'First Name',
+        },
+        firstName: {
+          type: new GraphQLNonNull(GraphQLString),
+          description: 'First Name',
+        },
+        lastName: {
+          type: new GraphQLNonNull(GraphQLString),
+          description: 'Last Name',
+        },
+      }),
+    });
+
+    const createPersonInputType = new GraphQLInputObjectType({
+      name: 'CreatePersonType',
+      description: 'Use this object to create new person',
+      fields: () => ({
+        firstName: {
+          type: new GraphQLNonNull(GraphQLString),
+          description: 'First Name',
+        },
+        lastName: {
+          type: new GraphQLNonNull(GraphQLString),
+          description: 'Last Name',
+        },
+      }),
+    });
+
+    before(() => {
+      const mutationType = new GraphQLObjectType({
+        name: 'RootMutationType',
+        description: 'Domain API actions',
+        fields: () => ({
+          createPerson: {
+            description: 'Creates a new person',
+            type: personType,
+            args: {
+              input: { type: new GraphQLNonNull(createPersonInputType) },
+            },
+            resolve: (root, inputPerson) => {
+              const { firstName, lastName } = inputPerson.input;
+
+              return {
+                id: 1,
+                firstName,
+                lastName,
+              };
+            },
+          },
+        }),
+      });
+
+      schema = mainModule
+        .builder()
+        .model(session.models.Person)
+        .extendWithMutations(mutationType)
+        .build();
+    });
+
+    it('allows to use provided mutations with the schema', () => {
+      const query = `
+        mutation {
+          createPerson(input: {
+             firstName: "Jon",
+             lastName: "Skeet"
+          }) {
+             id
+          }
+      }`;
+
+      return graphql(schema, query).then((res) => {
+        expect(res.data.createPerson.id).to.eql(1);
       });
     });
   });
