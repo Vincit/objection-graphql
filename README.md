@@ -128,8 +128,9 @@ const graphQlSchema = graphQlBuilder()
 
 # Extending your schema with mutations
 
-Often you need to provide mutations in your GraphQL schema. At the same time mutations can be quite opinionated with side effects and complex business logic. 
-Therefore we provide a method `extendWithMutations` which allows you to extend the generated query schema with mutations:
+Often you need to provide mutations in your GraphQL schema. At the same time mutations can be quite opinionated with side effects and complex business logic, so plain CUD implementation is not always a good idea. 
+Therefore we provide a method `extendWithMutations` which allows you to extend the generated query schema with mutations. You can provide a root `GraphQLObjectType` or function as a first argument for this method. 
+Function in this case plays as a strategy which receives current builder as a first argument and returns `GraphQLObjectType`. 
 
 ```js
 
@@ -190,11 +191,12 @@ const mutationType = new GraphQLObjectType({
     }),
 });
 
+//Here you can use a GraphQLObjectType or function as an argument for extendWithMutations
 schema = mainModule
-      .builder()
-      .model(session.models.Person)
-      .extendWithMutations(mutationType)
-      .build();    
+  .builder()
+  .model(session.models.Person)
+  .extendWithMutations(mutationType)
+  .build();    
 ```
    
 
