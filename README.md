@@ -194,7 +194,7 @@ const mutationType = new GraphQLObjectType({
 //Here you can use a GraphQLObjectType or function as an argument for extendWithMutations
 schema = mainModule
   .builder()
-  .model(session.models.Person)
+  .model(Person)
   .extendWithMutations(mutationType)
   .build();    
 ```
@@ -277,3 +277,7 @@ expressApp.get('/graphql', (req, res, next) => {
 
 ```
 
+## setBuilderOptions
+
+Allows you to customize **Objection** query builder behavior. For instance, you can pass `{ skipUndefined: true }` as an options argument. So, each time the builder is called, it will be called with **skipUndefined** enabled. 
+This can be useful when you use [graphql-tools](https://github.com/apollographql/graphql-tools) schema stitching. 
