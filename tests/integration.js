@@ -1107,4 +1107,27 @@ describe('integration tests', () => {
       });
     });
   });
+
+  describe('builder options', () => {
+    let schema;
+
+    before(() => {
+      schema = mainModule
+        .builder()
+        .model(session.models.Person)
+        .setBuilderOptions({
+          skipUndefined: true,
+        })
+        .build();
+    });
+
+    it('skipUndefined option should allow passing undefined arguments', () => graphql(
+      schema,
+      'query ($_firstName: String){ person(id: 1, firstName: $_firstName) { firstName } }',
+    ).then((res) => {
+      expect(res.data.person).to.eql({
+        firstName: 'Gustav',
+      });
+    }));
+  });
 });
