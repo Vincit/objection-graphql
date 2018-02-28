@@ -3,9 +3,7 @@ const os = require('os');
 const path = require('path');
 const expect = require('expect.js');
 const {
-  graphql, GraphQLList, GraphQLObjectType,
-  GraphQLInputObjectType, GraphQLNonNull,
-  GraphQLInt, GraphQLString,
+  graphql, GraphQLList, GraphQLObjectType, GraphQLInputObjectType, GraphQLNonNull, GraphQLInt, GraphQLString,
 } = require('graphql');
 const mainModule = require('../');
 const models = require('./setup/models');
@@ -28,78 +26,97 @@ describe('integration tests', () => {
 
   before(() => session.createTables());
 
-  before(() => session.models.Movie.query().insertGraph([{
-    name: 'The terminator',
-    releaseDate: '1984-10-26',
+  before(() =>
+    session.models.Movie.query().insertGraph([
+      {
+        name: 'The terminator',
+        releaseDate: '1984-10-26',
 
-    actors: [{
-      '#id': 'arnold',
-      firstName: 'Arnold',
-      lastName: 'Schwarzenegger',
-      gender: 'Male',
-      age: 73,
+        actors: [
+          {
+            '#id': 'arnold',
+            firstName: 'Arnold',
+            lastName: 'Schwarzenegger',
+            gender: 'Male',
+            age: 73,
 
-      addresses: [{
-        street: 'Arnoldlane 12',
-        city: 'Arnoldova',
-        zipCode: '123456',
-      }],
+            addresses: [
+              {
+                street: 'Arnoldlane 12',
+                city: 'Arnoldova',
+                zipCode: '123456',
+              },
+            ],
 
-      parent: {
-        firstName: 'Gustav',
-        lastName: 'Schwarzenegger',
-        gender: 'Male',
-        age: 98,
+            parent: {
+              firstName: 'Gustav',
+              lastName: 'Schwarzenegger',
+              gender: 'Male',
+              age: 98,
 
-        addresses: [{
-          street: 'Gustavroad 64',
-          city: 'Gustavia',
-          zipCode: '654321',
-        }],
+              addresses: [
+                {
+                  street: 'Gustavroad 64',
+                  city: 'Gustavia',
+                  zipCode: '654321',
+                },
+              ],
+            },
+          },
+          {
+            firstName: 'Michael',
+            lastName: 'Biehn',
+            gender: 'Male',
+            age: 45,
+          },
+        ],
+
+        reviews: [
+          {
+            title: 'Great movie',
+            stars: 5,
+            text: 'Awesome',
+
+            reviewer: {
+              '#id': 'randomDudette',
+              firstName: 'Some',
+              lastName: 'Random-Dudette',
+              gender: 'Female',
+              age: 20,
+            },
+          },
+          {
+            title: 'Changed my mind',
+            stars: 4,
+            text: 'Now I thing this is semi-awesome',
+
+            reviewer: {
+              '#ref': 'randomDudette',
+            },
+          },
+        ],
       },
-    }, {
-      firstName: 'Michael',
-      lastName: 'Biehn',
-      gender: 'Male',
-      age: 45,
-    }],
+      {
+        name: 'Terminator 2: Judgment Day',
+        releaseDate: '1991-07-03',
 
-    reviews: [{
-      title: 'Great movie',
-      stars: 5,
-      text: 'Awesome',
-
-      reviewer: {
-        '#id': 'randomDudette',
-        firstName: 'Some',
-        lastName: 'Random-Dudette',
-        gender: 'Female',
-        age: 20,
+        actors: [
+          {
+            '#ref': 'arnold',
+          },
+        ],
       },
-    }, {
-      title: 'Changed my mind',
-      stars: 4,
-      text: 'Now I thing this is semi-awesome',
+      {
+        name: 'Predator',
+        releaseDate: '1987-07-12',
 
-      reviewer: {
-        '#ref': 'randomDudette',
+        actors: [
+          {
+            '#ref': 'arnold',
+          },
+        ],
       },
-    }],
-  }, {
-    name: 'Terminator 2: Judgment Day',
-    releaseDate: '1991-07-03',
-
-    actors: [{
-      '#ref': 'arnold',
-    }],
-  }, {
-    name: 'Predator',
-    releaseDate: '1987-07-12',
-
-    actors: [{
-      '#ref': 'arnold',
-    }],
-  }]));
+    ]));
 
   describe('list fields', () => {
     let schema;
@@ -126,15 +143,20 @@ describe('integration tests', () => {
       return graphql(schema, '{ people { firstName } }', {
         knex: session.knex,
       }).then((res) => {
-        expect(res.data.people).to.eql([{
-          firstName: 'Gustav',
-        }, {
-          firstName: 'Michael',
-        }, {
-          firstName: 'Some',
-        }, {
-          firstName: 'Arnold',
-        }]);
+        expect(res.data.people).to.eql([
+          {
+            firstName: 'Gustav',
+          },
+          {
+            firstName: 'Michael',
+          },
+          {
+            firstName: 'Some',
+          },
+          {
+            firstName: 'Arnold',
+          },
+        ]);
       });
     });
 
@@ -147,98 +169,131 @@ describe('integration tests', () => {
           builder.where('firstName', 'Michael');
           onQueryCtx = ctx;
         },
-      }).then((res) => {
-        expect(res.data.people).to.eql([{
-          firstName: 'Michael',
-        }]);
-      }).then(() => {
-        expect(onQueryCtx.some).to.equal('stuff');
-      });
+      })
+        .then((res) => {
+          expect(res.data.people).to.eql([
+            {
+              firstName: 'Michael',
+            },
+          ]);
+        })
+        .then(() => {
+          expect(onQueryCtx.some).to.equal('stuff');
+        });
     });
 
-    it('root should have `people` field', () => graphql(schema, '{ people { firstName } }').then((res) => {
-      expect(res.data.people).to.eql([{
-        firstName: 'Gustav',
-      }, {
-        firstName: 'Michael',
-      }, {
-        firstName: 'Some',
-      }, {
-        firstName: 'Arnold',
-      }]);
-    }));
+    it('root should have `people` field', () =>
+      graphql(schema, '{ people { firstName } }').then((res) => {
+        expect(res.data.people).to.eql([
+          {
+            firstName: 'Gustav',
+          },
+          {
+            firstName: 'Michael',
+          },
+          {
+            firstName: 'Some',
+          },
+          {
+            firstName: 'Arnold',
+          },
+        ]);
+      }));
 
-    it('root should have `movies` field', () => graphql(schema, '{ movies(orderByDesc: name) { name } }').then((res) => {
-      expect(res.data.movies).to.eql([{
-        name: 'The terminator',
-      }, {
-        name: 'Terminator 2: Judgment Day',
-      }, {
-        name: 'Predator',
-      }]);
-    }));
+    it('root should have `movies` field', () =>
+      graphql(schema, '{ movies(orderByDesc: name) { name } }').then((res) => {
+        expect(res.data.movies).to.eql([
+          {
+            name: 'The terminator',
+          },
+          {
+            name: 'Terminator 2: Judgment Day',
+          },
+          {
+            name: 'Predator',
+          },
+        ]);
+      }));
 
-    it('root should have `reviews` field', () => graphql(schema, '{ reviews { title } }').then((res) => {
-      expect(res.data.reviews).to.eql([{
-        title: 'Great movie',
-      }, {
-        title: 'Changed my mind',
-      }]);
-    }));
+    it('root should have `reviews` field', () =>
+      graphql(schema, '{ reviews { title } }').then((res) => {
+        expect(res.data.reviews).to.eql([
+          {
+            title: 'Great movie',
+          },
+          {
+            title: 'Changed my mind',
+          },
+        ]);
+      }));
 
-    it('`people` field should have all properties defined in the Person model\'s jsonSchema', () => graphql(schema, '{ people { id, age, gender, firstName, lastName, parentId, addresses { street, city, zipCode } } }').then((res) => {
-      expect(res.data.people).to.eql([{
-        id: 1,
-        age: 98,
-        firstName: 'Gustav',
-        lastName: 'Schwarzenegger',
-        gender: 'Male',
-        parentId: null,
-        addresses: [{
-          street: 'Gustavroad 64',
-          city: 'Gustavia',
-          zipCode: '654321',
-        }],
-      }, {
-        id: 2,
-        age: 45,
-        firstName: 'Michael',
-        lastName: 'Biehn',
-        gender: 'Male',
-        parentId: null,
-        addresses: null,
-      }, {
-        id: 3,
-        age: 20,
-        firstName: 'Some',
-        lastName: 'Random-Dudette',
-        gender: 'Female',
-        parentId: null,
-        addresses: null,
-      }, {
-        id: 4,
-        age: 73,
-        firstName: 'Arnold',
-        lastName: 'Schwarzenegger',
-        gender: 'Male',
-        parentId: 1,
-        addresses: [{
-          street: 'Arnoldlane 12',
-          city: 'Arnoldova',
-          zipCode: '123456',
-        }],
-      }]);
-    }));
+    it("`people` field should have all properties defined in the Person model's jsonSchema", () =>
+      graphql(schema, '{ people { id, age, gender, firstName, lastName, parentId, addresses { street, city, zipCode } } }').then((res) => {
+        expect(res.data.people).to.eql([
+          {
+            id: 1,
+            age: 98,
+            firstName: 'Gustav',
+            lastName: 'Schwarzenegger',
+            gender: 'Male',
+            parentId: null,
+            addresses: [
+              {
+                street: 'Gustavroad 64',
+                city: 'Gustavia',
+                zipCode: '654321',
+              },
+            ],
+          },
+          {
+            id: 2,
+            age: 45,
+            firstName: 'Michael',
+            lastName: 'Biehn',
+            gender: 'Male',
+            parentId: null,
+            addresses: null,
+          },
+          {
+            id: 3,
+            age: 20,
+            firstName: 'Some',
+            lastName: 'Random-Dudette',
+            gender: 'Female',
+            parentId: null,
+            addresses: null,
+          },
+          {
+            id: 4,
+            age: 73,
+            firstName: 'Arnold',
+            lastName: 'Schwarzenegger',
+            gender: 'Male',
+            parentId: 1,
+            addresses: [
+              {
+                street: 'Arnoldlane 12',
+                city: 'Arnoldova',
+                zipCode: '123456',
+              },
+            ],
+          },
+        ]);
+      }));
 
-    it('should work with the meta field `__typename`', () => graphql(schema, '{ reviews { title, __typename } }').then((res) => {
-      expect(res.data.reviews).to.eql([{
-        __typename: 'Review',
-        title: 'Great movie',
-      }, {
-        __typename: 'Review',
-        title: 'Changed my mind',
-      }]);
-    }));
+    it('should work with the meta field `__typename`', () =>
+      graphql(schema, '{ reviews { title, __typename } }').then((res) => {
+        expect(res.data.reviews).to.eql([
+          {
+            __typename: 'Review',
+            title: 'Great movie',
+          },
+          {
+            __typename: 'Review',
+            title: 'Changed my mind',
+          },
+        ]);
+      }));
 
     describe('#selectFiltering', () => {
       it('should select all columns for use in virtual attributes when selectFiltering is disabled', () => {
@@ -251,27 +306,32 @@ describe('integration tests', () => {
           .build();
 
         return graphql(schema, '{ people { id, firstName, lastName, fullName } }').then((res) => {
-          expect(res.data.people).to.eql([{
-            id: 1,
-            firstName: 'Gustav',
-            lastName: 'Schwarzenegger',
-            fullName: 'Gustav Schwarzenegger',
-          }, {
-            id: 2,
-            firstName: 'Michael',
-            lastName: 'Biehn',
-            fullName: 'Michael Biehn',
-          }, {
-            id: 3,
-            firstName: 'Some',
-            lastName: 'Random-Dudette',
-            fullName: 'Some Random-Dudette',
-          }, {
-            id: 4,
-            firstName: 'Arnold',
-            lastName: 'Schwarzenegger',
-            fullName: 'Arnold Schwarzenegger',
-          }]);
+          expect(res.data.people).to.eql([
+            {
+              id: 1,
+              firstName: 'Gustav',
+              lastName: 'Schwarzenegger',
+              fullName: 'Gustav Schwarzenegger',
+            },
+            {
+              id: 2,
+              firstName: 'Michael',
+              lastName: 'Biehn',
+              fullName: 'Michael Biehn',
+            },
+            {
+              id: 3,
+              firstName: 'Some',
+              lastName: 'Random-Dudette',
+              fullName: 'Some Random-Dudette',
+            },
+            {
+              id: 4,
+              firstName: 'Arnold',
+              lastName: 'Schwarzenegger',
+              fullName: 'Arnold Schwarzenegger',
+            },
+          ]);
         });
       });
     });
@@ -296,7 +356,14 @@ describe('integration tests', () => {
               args[`${propName}EqualsReverse`] = {
                 type: field.type,
                 query: (query, value) => {
-                  query.where(columnName, '=', value.split('').reverse().join(''));
+                  query.where(
+                    columnName,
+                    '=',
+                    value
+                      .split('')
+                      .reverse()
+                      .join(''),
+                  );
                 },
               };
             });
@@ -305,10 +372,16 @@ describe('integration tests', () => {
           })
           .build();
 
-        return graphql(schema, '{ people(firstNameEqualsReverse: "dlonrA", lastNameEqualsReverse: "reggenezrawhcS") { firstName } }', session.knex).then((res) => {
-          expect(res.data.people).to.eql([{
-            firstName: 'Arnold',
-          }]);
+        return graphql(
+          schema,
+          '{ people(firstNameEqualsReverse: "dlonrA", lastNameEqualsReverse: "reggenezrawhcS") { firstName } }',
+          session.knex,
+        ).then((res) => {
+          expect(res.data.people).to.eql([
+            {
+              firstName: 'Arnold',
+            },
+          ]);
         });
       });
     });
@@ -333,371 +406,528 @@ describe('integration tests', () => {
             orderBy: 'order_by',
             orderByDesc: 'order_by_desc',
             range: 'range',
+            limit: 'limit',
+            offset: 'offset',
           })
           .build();
 
-        return graphql(schema, '{ people(firstName_eq: "Arnold", lastName_in: ["Schwarzenegger", "Random-Dudette"], order_by: age) { firstName } }', session.knex).then((res) => {
-          expect(res.data.people).to.eql([{
-            firstName: 'Arnold',
-          }]);
+        return graphql(
+          schema,
+          '{ people(firstName_eq: "Arnold", lastName_in: ["Schwarzenegger", "Random-Dudette"], order_by: age) { firstName } }',
+          session.knex,
+        ).then((res) => {
+          expect(res.data.people).to.eql([
+            {
+              firstName: 'Arnold',
+            },
+          ]);
         });
       });
     });
 
     describe('relations', () => {
-      it('`people` should have all the relations of a Person model', () => graphql(schema, '{ people { firstName, parent { firstName }, children { firstName }, movies { name }, reviews { title } } }').then((res) => {
-        const arnold = _.find(res.data.people, { firstName: 'Arnold' });
+      it('`people` should have all the relations of a Person model', () =>
+        graphql(schema, '{ people { firstName, parent { firstName }, children { firstName }, movies { name }, reviews { title } } }').then((res) => {
+          const arnold = _.find(res.data.people, { firstName: 'Arnold' });
 
-        expect(arnold).to.eql({
-          firstName: 'Arnold',
-          children: [],
-          reviews: [],
-          parent: {
-            firstName: 'Gustav',
-          },
-          movies: [{
+          expect(arnold).to.eql({
+            firstName: 'Arnold',
+            children: [],
+            reviews: [],
+            parent: {
+              firstName: 'Gustav',
+            },
+            movies: [
+              {
+                name: 'The terminator',
+              },
+              {
+                name: 'Terminator 2: Judgment Day',
+              },
+              {
+                name: 'Predator',
+              },
+            ],
+          });
+        }));
+
+      it('`movies` should have all the relations of a Movies model', () =>
+        graphql(schema, '{ movies { name, releaseDate, actors { firstName }, reviews { title } } }').then((res) => {
+          const terminator = _.find(res.data.movies, { name: 'The terminator' });
+
+          expect(terminator).to.eql({
             name: 'The terminator',
-          }, {
-            name: 'Terminator 2: Judgment Day',
-          }, {
-            name: 'Predator',
-          }],
-        });
-      }));
+            releaseDate: '1984-10-26',
+            actors: [
+              {
+                firstName: 'Arnold',
+              },
+              {
+                firstName: 'Michael',
+              },
+            ],
+            reviews: [
+              {
+                title: 'Great movie',
+              },
+              {
+                title: 'Changed my mind',
+              },
+            ],
+          });
+        }));
 
-      it('`movies` should have all the relations of a Movies model', () => graphql(schema, '{ movies { name, releaseDate, actors { firstName }, reviews { title } } }').then((res) => {
-        const terminator = _.find(res.data.movies, { name: 'The terminator' });
+      it('`reviews` should have all the relations of a Review model', () =>
+        graphql(schema, '{ reviews { title, reviewer { firstName }, movie { name } } }').then((res) => {
+          const greatMovie = _.find(res.data.reviews, { title: 'Great movie' });
 
-        expect(terminator).to.eql({
-          name: 'The terminator',
-          releaseDate: '1984-10-26',
-          actors: [{
-            firstName: 'Arnold',
-          }, {
-            firstName: 'Michael',
-          }],
-          reviews: [{
+          expect(greatMovie).to.eql({
             title: 'Great movie',
-          }, {
-            title: 'Changed my mind',
-          }],
-        });
-      }));
+            reviewer: {
+              firstName: 'Some',
+            },
+            movie: {
+              name: 'The terminator',
+            },
+          });
+        }));
 
-      it('`reviews` should have all the relations of a Review model', () => graphql(schema, '{ reviews { title, reviewer { firstName }, movie { name } } }').then((res) => {
-        const greatMovie = _.find(res.data.reviews, { title: 'Great movie' });
+      it('should be able to fetch nested relations', () =>
+        graphql(schema, '{ movies { id, name, actors { id, firstName, movies { name } }, reviews { id, title, reviewer { id, firstName } } } }').then((res) => {
+          const terminator = _.find(res.data.movies, { name: 'The terminator' });
 
-        expect(greatMovie).to.eql({
-          title: 'Great movie',
-          reviewer: {
-            firstName: 'Some',
-          },
-          movie: {
+          expect(terminator).to.eql({
+            id: 1,
             name: 'The terminator',
+            actors: [
+              {
+                id: 4,
+                firstName: 'Arnold',
+
+                movies: [
+                  {
+                    name: 'The terminator',
+                  },
+                  {
+                    name: 'Terminator 2: Judgment Day',
+                  },
+                  {
+                    name: 'Predator',
+                  },
+                ],
+              },
+              {
+                id: 2,
+                firstName: 'Michael',
+
+                movies: [
+                  {
+                    name: 'The terminator',
+                  },
+                ],
+              },
+            ],
+
+            reviews: [
+              {
+                id: 1,
+                title: 'Great movie',
+
+                reviewer: {
+                  id: 3,
+                  firstName: 'Some',
+                },
+              },
+              {
+                id: 2,
+                title: 'Changed my mind',
+
+                reviewer: {
+                  id: 3,
+                  firstName: 'Some',
+                },
+              },
+            ],
+          });
+        }));
+
+      it('should be able to fetch nested relations using JoinEagerAlgorithm', () =>
+        graphql(
+          schema,
+          `
+						{
+							movies {
+								id
+								name
+
+								actors {
+									id
+									firstName
+
+									movies {
+										name
+									}
+								}
+
+								reviews {
+									id
+									title
+
+									reviewer {
+										id
+										firstName
+									}
+								}
+							}
+						}
+					`,
+          {
+            onQuery(builder) {
+              builder.eagerAlgorithm(session.models.Person.JoinEagerAlgorithm);
+            },
           },
-        });
-      }));
+        ).then((res) => {
+          const terminator = _.find(res.data.movies, { name: 'The terminator' });
 
-      it('should be able to fetch nested relations', () => graphql(schema, '{ movies { id, name, actors { id, firstName, movies { name } }, reviews { id, title, reviewer { id, firstName } } } }').then((res) => {
-        const terminator = _.find(res.data.movies, { name: 'The terminator' });
-
-        expect(terminator).to.eql({
-          id: 1,
-          name: 'The terminator',
-          actors: [{
-            id: 4,
-            firstName: 'Arnold',
-
-            movies: [{
-              name: 'The terminator',
-            }, {
-              name: 'Terminator 2: Judgment Day',
-            }, {
-              name: 'Predator',
-            }],
-          }, {
-            id: 2,
-            firstName: 'Michael',
-
-            movies: [{
-              name: 'The terminator',
-            }],
-          }],
-
-          reviews: [{
+          expect(terminator).to.eql({
             id: 1,
-            title: 'Great movie',
+            name: 'The terminator',
+            actors: [
+              {
+                id: 4,
+                firstName: 'Arnold',
 
-            reviewer: {
-              id: 3,
-              firstName: 'Some',
-            },
-          }, {
-            id: 2,
-            title: 'Changed my mind',
+                movies: [
+                  {
+                    name: 'The terminator',
+                  },
+                  {
+                    name: 'Terminator 2: Judgment Day',
+                  },
+                  {
+                    name: 'Predator',
+                  },
+                ],
+              },
+              {
+                id: 2,
+                firstName: 'Michael',
 
-            reviewer: {
-              id: 3,
-              firstName: 'Some',
-            },
-          }],
-        });
-      }));
+                movies: [
+                  {
+                    name: 'The terminator',
+                  },
+                ],
+              },
+            ],
 
-      it('should be able to fetch nested relations using JoinEagerAlgorithm', () => graphql(schema, `{
-          movies {
-            id,
-            name,
+            reviews: [
+              {
+                id: 1,
+                title: 'Great movie',
 
-            actors {
-              id,
-              firstName,
+                reviewer: {
+                  id: 3,
+                  firstName: 'Some',
+                },
+              },
+              {
+                id: 2,
+                title: 'Changed my mind',
 
-              movies {
-                name
-              }
-            },
-
-            reviews {
-              id,
-              title,
-
-              reviewer {
-                id,
-                firstName
-              }
-            }
-          }
-        }`, {
-        onQuery(builder) {
-          builder.eagerAlgorithm(session.models.Person.JoinEagerAlgorithm);
-        },
-      }).then((res) => {
-        const terminator = _.find(res.data.movies, { name: 'The terminator' });
-
-        expect(terminator).to.eql({
-          id: 1,
-          name: 'The terminator',
-          actors: [{
-            id: 4,
-            firstName: 'Arnold',
-
-            movies: [{
-              name: 'The terminator',
-            }, {
-              name: 'Terminator 2: Judgment Day',
-            }, {
-              name: 'Predator',
-            }],
-          }, {
-            id: 2,
-            firstName: 'Michael',
-
-            movies: [{
-              name: 'The terminator',
-            }],
-          }],
-
-          reviews: [{
-            id: 1,
-            title: 'Great movie',
-
-            reviewer: {
-              id: 3,
-              firstName: 'Some',
-            },
-          }, {
-            id: 2,
-            title: 'Changed my mind',
-
-            reviewer: {
-              id: 3,
-              firstName: 'Some',
-            },
-          }],
-        });
-      }));
+                reviewer: {
+                  id: 3,
+                  firstName: 'Some',
+                },
+              },
+            ],
+          });
+        }));
     });
 
-
     describe('arguments', () => {
-      it('each property name should work as a `==` filter', () => graphql(schema, '{ people(age: 73) { firstName } }').then((res) => {
-        expect(res.data.people).to.eql([{
-          firstName: 'Arnold',
-        }]);
-      }));
+      it('each property name should work as a `==` filter', () =>
+        graphql(schema, '{ people(age: 73) { firstName } }').then((res) => {
+          expect(res.data.people).to.eql([
+            {
+              firstName: 'Arnold',
+            },
+          ]);
+        }));
 
-      it('adding \'Gt\' after a property name should create a `>` filter', () => graphql(schema, '{ people(ageGt: 73) { firstName } }').then((res) => {
-        expect(res.data.people).to.eql([{
-          firstName: 'Gustav',
-        }]);
-      }));
+      it("adding 'Gt' after a property name should create a `>` filter", () =>
+        graphql(schema, '{ people(ageGt: 73) { firstName } }').then((res) => {
+          expect(res.data.people).to.eql([
+            {
+              firstName: 'Gustav',
+            },
+          ]);
+        }));
 
-      it('adding \'Gte\' after a property name should create a `>=` filter', () => graphql(schema, '{ people(ageGte: 73) { firstName } }').then((res) => {
-        expect(res.data.people).to.eql([{
-          firstName: 'Gustav',
-        }, {
-          firstName: 'Arnold',
-        }]);
-      }));
+      it("adding 'Gte' after a property name should create a `>=` filter", () =>
+        graphql(schema, '{ people(ageGte: 73) { firstName } }').then((res) => {
+          expect(res.data.people).to.eql([
+            {
+              firstName: 'Gustav',
+            },
+            {
+              firstName: 'Arnold',
+            },
+          ]);
+        }));
 
-      it('adding \'Lt\' after a property name should create a `<` filter', () => graphql(schema, '{ people(ageLt: 73) { firstName } }').then((res) => {
-        expect(res.data.people).to.eql([{
-          firstName: 'Michael',
-        }, {
-          firstName: 'Some',
-        }]);
-      }));
+      it("adding 'Lt' after a property name should create a `<` filter", () =>
+        graphql(schema, '{ people(ageLt: 73) { firstName } }').then((res) => {
+          expect(res.data.people).to.eql([
+            {
+              firstName: 'Michael',
+            },
+            {
+              firstName: 'Some',
+            },
+          ]);
+        }));
 
-      it('adding \'Lte\' after a property name should create a `<=` filter', () => graphql(schema, '{ people(ageLte: 73) { firstName } }').then((res) => {
-        expect(res.data.people).to.eql([{
-          firstName: 'Michael',
-        }, {
-          firstName: 'Some',
-        }, {
-          firstName: 'Arnold',
-        }]);
-      }));
+      it("adding 'Lte' after a property name should create a `<=` filter", () =>
+        graphql(schema, '{ people(ageLte: 73) { firstName } }').then((res) => {
+          expect(res.data.people).to.eql([
+            {
+              firstName: 'Michael',
+            },
+            {
+              firstName: 'Some',
+            },
+            {
+              firstName: 'Arnold',
+            },
+          ]);
+        }));
 
-      it('adding \'Like\' after a property name should create a `like` filter', () => graphql(schema, '{ people(lastNameLike: "%egg%") { firstName } }').then((res) => {
-        expect(res.data.people).to.eql([{
-          firstName: 'Gustav',
-        }, {
-          firstName: 'Arnold',
-        }]);
-      }));
+      it("adding 'Like' after a property name should create a `like` filter", () =>
+        graphql(schema, '{ people(lastNameLike: "%egg%") { firstName } }').then((res) => {
+          expect(res.data.people).to.eql([
+            {
+              firstName: 'Gustav',
+            },
+            {
+              firstName: 'Arnold',
+            },
+          ]);
+        }));
 
-      it('adding \'LikeNoCase\' after a property name should create a case insensitive `like` filter', () => graphql(schema, '{ people(lastNameLikeNoCase: "sch%") { firstName } }').then((res) => {
-        expect(res.data.people).to.eql([{
-          firstName: 'Gustav',
-        }, {
-          firstName: 'Arnold',
-        }]);
-      }));
+      it("adding 'LikeNoCase' after a property name should create a case insensitive `like` filter", () =>
+        graphql(schema, '{ people(lastNameLikeNoCase: "sch%") { firstName } }').then((res) => {
+          expect(res.data.people).to.eql([
+            {
+              firstName: 'Gustav',
+            },
+            {
+              firstName: 'Arnold',
+            },
+          ]);
+        }));
 
-      it('adding \'In\' after a property name should create an `in` filter', () => graphql(schema, '{ people(ageIn: [45, 98]) { firstName } }').then((res) => {
-        expect(res.data.people).to.eql([{
-          firstName: 'Gustav',
-        }, {
-          firstName: 'Michael',
-        }]);
-      }));
+      it("adding 'In' after a property name should create an `in` filter", () =>
+        graphql(schema, '{ people(ageIn: [45, 98]) { firstName } }').then((res) => {
+          expect(res.data.people).to.eql([
+            {
+              firstName: 'Gustav',
+            },
+            {
+              firstName: 'Michael',
+            },
+          ]);
+        }));
 
-      it('adding \'NotIn\' after a property name should create an `not in` filter', () => graphql(schema, '{ people(ageNotIn: [45, 98]) { firstName } }').then((res) => {
-        expect(res.data.people).to.eql([{
-          firstName: 'Some',
-        }, {
-          firstName: 'Arnold',
-        }]);
-      }));
+      it("adding 'NotIn' after a property name should create an `not in` filter", () =>
+        graphql(schema, '{ people(ageNotIn: [45, 98]) { firstName } }').then((res) => {
+          expect(res.data.people).to.eql([
+            {
+              firstName: 'Some',
+            },
+            {
+              firstName: 'Arnold',
+            },
+          ]);
+        }));
 
-      it('adding \'IsNull: true\' after a property name should create an `is null` filter', () => graphql(schema, '{ people(parentIdIsNull: true) { firstName } }').then((res) => {
-        expect(res.data.people).to.eql([{
-          firstName: 'Gustav',
-        }, {
-          firstName: 'Michael',
-        }, {
-          firstName: 'Some',
-        }]);
-      }));
+      it("adding 'IsNull: true' after a property name should create an `is null` filter", () =>
+        graphql(schema, '{ people(parentIdIsNull: true) { firstName } }').then((res) => {
+          expect(res.data.people).to.eql([
+            {
+              firstName: 'Gustav',
+            },
+            {
+              firstName: 'Michael',
+            },
+            {
+              firstName: 'Some',
+            },
+          ]);
+        }));
 
-      it('adding \'IsNull: false\' after a property name should create an `not null` filter', () => graphql(schema, '{ people(parentIdIsNull: false) { firstName } }').then((res) => {
-        expect(res.data.people).to.eql([{
-          firstName: 'Arnold',
-        }]);
-      }));
+      it("adding 'IsNull: false' after a property name should create an `not null` filter", () =>
+        graphql(schema, '{ people(parentIdIsNull: false) { firstName } }').then((res) => {
+          expect(res.data.people).to.eql([
+            {
+              firstName: 'Arnold',
+            },
+          ]);
+        }));
 
-      it('orderBy should order by the given property', () => graphql(schema, '{ people(orderBy: age) { firstName, age } }').then((res) => {
-        expect(res.data.people).to.eql([{
-          firstName: 'Some',
-          age: 20,
-        }, {
-          firstName: 'Michael',
-          age: 45,
-        }, {
-          firstName: 'Arnold',
-          age: 73,
-        }, {
-          firstName: 'Gustav',
-          age: 98,
-        }]);
-      }));
+      it('orderBy should order by the given property', () =>
+        graphql(schema, '{ people(orderBy: age) { firstName, age } }').then((res) => {
+          expect(res.data.people).to.eql([
+            {
+              firstName: 'Some',
+              age: 20,
+            },
+            {
+              firstName: 'Michael',
+              age: 45,
+            },
+            {
+              firstName: 'Arnold',
+              age: 73,
+            },
+            {
+              firstName: 'Gustav',
+              age: 98,
+            },
+          ]);
+        }));
 
-      it('orderByDesc should order by the given property in descending order', () => graphql(schema, '{ people(orderByDesc: age) { firstName, age } }').then((res) => {
-        expect(res.data.people).to.eql([{
-          firstName: 'Gustav',
-          age: 98,
-        }, {
-          firstName: 'Arnold',
-          age: 73,
-        }, {
-          firstName: 'Michael',
-          age: 45,
-        }, {
-          firstName: 'Some',
-          age: 20,
-        }]);
-      }));
+      it('orderByDesc should order by the given property in descending order', () =>
+        graphql(schema, '{ people(orderByDesc: age) { firstName, age } }').then((res) => {
+          expect(res.data.people).to.eql([
+            {
+              firstName: 'Gustav',
+              age: 98,
+            },
+            {
+              firstName: 'Arnold',
+              age: 73,
+            },
+            {
+              firstName: 'Michael',
+              age: 45,
+            },
+            {
+              firstName: 'Some',
+              age: 20,
+            },
+          ]);
+        }));
 
-      it('range should select a range', () => graphql(schema, '{ people(range: [1, 2], orderBy: age) { firstName, age } }').then((res) => {
-        expect(res.data.people).to.eql([{
-          firstName: 'Michael',
-          age: 45,
-        }, {
-          firstName: 'Arnold',
-          age: 73,
-        }]);
-      }));
+      it('range should select a range', () =>
+        graphql(schema, '{ people(range: [1, 2], orderBy: age) { firstName, age } }').then((res) => {
+          expect(res.data.people).to.eql([
+            {
+              firstName: 'Michael',
+              age: 45,
+            },
+            {
+              firstName: 'Arnold',
+              age: 73,
+            },
+          ]);
+        }));
 
-      it('jsonSchema enums should be usable as GraphQL enums', () => graphql(schema, '{ people(gender: Male) { firstName } }').then((res) => {
-        expect(res.data.people).to.eql([{
-          firstName: 'Gustav',
-        }, {
-          firstName: 'Michael',
-        }, {
-          firstName: 'Arnold',
-        }]);
-      }));
+      it('limit should limit the number of records to fetch and return', () => {
+        graphql(schema, '{ people(limit: 1, orderBy: age) { firstName, age } }').then((res) => {
+          expect(res.data.people).to.eql([
+            {
+              firstName: 'Michael',
+              age: 45,
+            },
+          ]);
+        });
+      });
+
+      it('offset should offset the number of records to fetch and return', () => {
+        graphql(schema, '{ people(limit: 1, offset: 2, orderBy: age) { firstName, age } }').then((res) => {
+          expect(res.data.people).to.eql([
+            {
+              firstName: 'Arnold',
+              age: 73,
+            },
+          ]);
+        });
+      });
+
+      it('jsonSchema enums should be usable as GraphQL enums', () =>
+        graphql(schema, '{ people(gender: Male) { firstName } }').then((res) => {
+          expect(res.data.people).to.eql([
+            {
+              firstName: 'Gustav',
+            },
+            {
+              firstName: 'Michael',
+            },
+            {
+              firstName: 'Arnold',
+            },
+          ]);
+        }));
 
       describe('relations', () => {
-        it('relations should take the same arguments as root fields (1)', () => graphql(schema, '{ person(firstName: "Arnold") { movies(releaseDateGt: "1987-01-01", orderBy: releaseDate) { name } } }').then((res) => {
-          expect(res.data.person).to.eql({
-            movies: [{
-              name: 'Predator',
-            }, {
-              name: 'Terminator 2: Judgment Day',
-            }],
-          });
-        }));
+        it('relations should take the same arguments as root fields (1)', () =>
+          graphql(schema, '{ person(firstName: "Arnold") { movies(releaseDateGt: "1987-01-01", orderBy: releaseDate) { name } } }').then((res) => {
+            expect(res.data.person).to.eql({
+              movies: [
+                {
+                  name: 'Predator',
+                },
+                {
+                  name: 'Terminator 2: Judgment Day',
+                },
+              ],
+            });
+          }));
 
-        it('relations should take the same arguments as root fields (2)', () => graphql(schema, '{ person(firstName: "Arnold") { movies(releaseDateGt: "1987-01-01", orderByDesc: releaseDate) { name } } }').then((res) => {
-          expect(res.data.person).to.eql({
-            movies: [{
-              name: 'Terminator 2: Judgment Day',
-            }, {
-              name: 'Predator',
-            }],
-          });
-        }));
+        it('relations should take the same arguments as root fields (2)', () =>
+          graphql(schema, '{ person(firstName: "Arnold") { movies(releaseDateGt: "1987-01-01", orderByDesc: releaseDate) { name } } }').then((res) => {
+            expect(res.data.person).to.eql({
+              movies: [
+                {
+                  name: 'Terminator 2: Judgment Day',
+                },
+                {
+                  name: 'Predator',
+                },
+              ],
+            });
+          }));
 
-        it('relations should take the same arguments as root fields (3)', () => graphql(schema, '{ person(firstName: "Arnold") { movies(releaseDateLte: "1987-01-01", orderBy: releaseDate) { name } } }').then((res) => {
-          expect(res.data.person).to.eql({
-            movies: [{
-              name: 'The terminator',
-            }],
-          });
-        }));
+        it('relations should take the same arguments as root fields (3)', () =>
+          graphql(schema, '{ person(firstName: "Arnold") { movies(releaseDateLte: "1987-01-01", orderBy: releaseDate) { name } } }').then((res) => {
+            expect(res.data.person).to.eql({
+              movies: [
+                {
+                  name: 'The terminator',
+                },
+              ],
+            });
+          }));
 
-        it('nested relations should take the same arguments as root fields', () => graphql(schema, '{ person(firstName: "Arnold") { movies(name: "The terminator") { name, actors(firstNameLikeNoCase : "%chae%") { firstName } } } }').then((res) => {
-          expect(res.data.person).to.eql({
-            movies: [{
-              name: 'The terminator',
-              actors: [{
-                firstName: 'Michael',
-              }],
-            }],
-          });
-        }));
+        it('nested relations should take the same arguments as root fields', () =>
+          graphql(
+            schema,
+            '{ person(firstName: "Arnold") { movies(name: "The terminator") { name, actors(firstNameLikeNoCase : "%chae%") { firstName } } } }',
+          ).then((res) => {
+            expect(res.data.person).to.eql({
+              movies: [
+                {
+                  name: 'The terminator',
+                  actors: [
+                    {
+                      firstName: 'Michael',
+                    },
+                  ],
+                },
+              ],
+            });
+          }));
       });
     });
   });
@@ -714,34 +944,45 @@ describe('integration tests', () => {
         .build();
     });
 
-    it('root should have `person` field', () => graphql(schema, '{ person(id: 1) { firstName } }').then((res) => {
-      expect(res.data.person).to.eql({
-        firstName: 'Gustav',
-      });
-    }));
+    it('root should have `person` field', () =>
+      graphql(schema, '{ person(id: 1) { firstName } }').then((res) => {
+        expect(res.data.person).to.eql({
+          firstName: 'Gustav',
+        });
+      }));
 
-    it('root should have `movie` field', () => graphql(schema, '{ movie(nameLikeNoCase: "%terminator 2%") { name } }').then((res) => {
-      expect(res.data.movie).to.eql({
-        name: 'Terminator 2: Judgment Day',
-      });
-    }));
+    it('root should have `movie` field', () =>
+      graphql(schema, '{ movie(nameLikeNoCase: "%terminator 2%") { name } }').then((res) => {
+        expect(res.data.movie).to.eql({
+          name: 'Terminator 2: Judgment Day',
+        });
+      }));
 
-    it('root should have `review` field', () => graphql(schema, '{ review(id: 1) { title } }').then((res) => {
-      expect(res.data.review).to.eql({
-        title: 'Great movie',
-      });
-    }));
+    it('root should have `review` field', () =>
+      graphql(schema, '{ review(id: 1) { title } }').then((res) => {
+        expect(res.data.review).to.eql({
+          title: 'Great movie',
+        });
+      }));
 
-    it('single fields should have all the same arguments and relations as the list fields', () => graphql(schema, '{ person(firstName: "Arnold") { movies(name: "The terminator") { name, actors(firstNameLikeNoCase : "%chae%") { firstName } } } }').then((res) => {
-      expect(res.data.person).to.eql({
-        movies: [{
-          name: 'The terminator',
-          actors: [{
-            firstName: 'Michael',
-          }],
-        }],
-      });
-    }));
+    it('single fields should have all the same arguments and relations as the list fields', () =>
+      graphql(
+        schema,
+        '{ person(firstName: "Arnold") { movies(name: "The terminator") { name, actors(firstNameLikeNoCase : "%chae%") { firstName } } } }',
+      ).then((res) => {
+        expect(res.data.person).to.eql({
+          movies: [
+            {
+              name: 'The terminator',
+              actors: [
+                {
+                  firstName: 'Michael',
+                },
+              ],
+            },
+          ],
+        });
+      }));
   });
 
   describe('Queries with variables', () => {
@@ -800,11 +1041,14 @@ describe('integration tests', () => {
       };
 
       return graphql(schema, query, null, null, variableValues).then((res) => {
-        expect(res.data.people).to.eql([{
-          id: 2,
-        }, {
-          id: 3,
-        }]);
+        expect(res.data.people).to.eql([
+          {
+            id: 2,
+          },
+          {
+            id: 3,
+          },
+        ]);
       });
     });
 
@@ -821,15 +1065,20 @@ describe('integration tests', () => {
       };
 
       return graphql(schema, query, null, null, variableValues).then((res) => {
-        expect(res.data.people).to.eql([{
-          id: 4,
-        }, {
-          id: 3,
-        }, {
-          id: 2,
-        }, {
-          id: 1,
-        }]);
+        expect(res.data.people).to.eql([
+          {
+            id: 4,
+          },
+          {
+            id: 3,
+          },
+          {
+            id: 2,
+          },
+          {
+            id: 1,
+          },
+        ]);
       });
     });
   });
@@ -1121,13 +1370,11 @@ describe('integration tests', () => {
         .build();
     });
 
-    it('skipUndefined option should allow passing undefined arguments', () => graphql(
-      schema,
-      'query ($_firstName: String){ person(id: 1, firstName: $_firstName) { firstName } }',
-    ).then((res) => {
-      expect(res.data.person).to.eql({
-        firstName: 'Gustav',
-      });
-    }));
+    it('skipUndefined option should allow passing undefined arguments', () =>
+      graphql(schema, 'query ($_firstName: String){ person(id: 1, firstName: $_firstName) { firstName } }').then((res) => {
+        expect(res.data.person).to.eql({
+          firstName: 'Gustav',
+        });
+      }));
   });
 });
