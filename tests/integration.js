@@ -555,32 +555,32 @@ describe('integration tests', () => {
         graphql(
           schema,
           `
-						{
-							movies {
-								id
-								name
+            {
+              movies {
+                id
+                name
 
-								actors {
-									id
-									firstName
+                actors {
+                  id
+                  firstName
 
-									movies {
-										name
-									}
-								}
+                  movies {
+                    name
+                  }
+                }
 
-								reviews {
-									id
-									title
+                reviews {
+                  id
+                  title
 
-									reviewer {
-										id
-										firstName
-									}
-								}
-							}
-						}
-					`,
+                  reviewer {
+                    id
+                    firstName
+                  }
+                }
+              }
+            }
+          `,
           {
             onQuery(builder) {
               builder.eagerAlgorithm(session.models.Person.JoinEagerAlgorithm);
