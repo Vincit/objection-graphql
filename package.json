@@ -1,6 +1,6 @@
 {
   "name": "objection-graphql",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Automatically generates GraphQL schema for objection.js models",
   "main": "objection-graphql.js",
   "scripts": {
@@ -42,11 +42,11 @@
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.8.0",
     "expect.js": "^0.3.1",
-    "graphql": "^0.10.3",
+    "graphql": "^0.13.2",
     "istanbul": "^0.4.5",
-    "knex": "^0.13.0",
+    "knex": "^0.14.6",
     "mocha": "^3.4.2",
-    "objection": "^0.8.3",
-    "sqlite3": "^3.1.8"
+    "objection": "^1.1.7",
+    "sqlite3": "^4.0.0"
   }
 }
