@@ -87,6 +87,8 @@ argument|action
 `orderBy: prop`|Order the result by some property
 `orderByDesc: prop`|Order the result by some property in descending order
 `range: [start, end]`|Select a range. Doesn't work for relations!
+`limit: prop`|Select a given number of records.
+`offset: prop`|Skip a given number of records.
 
 # Adding your own custom arguments
 
@@ -224,7 +226,9 @@ const graphQlSchema = graphQlBuilder()
     notIn: '_not_in',
     orderBy: 'order_by',
     orderByDesc: 'order_by_desc',
-    range: 'range'
+    range: 'range',
+    limit: 'limit',
+    offset: 'offset'
   })
   .build();
 ```

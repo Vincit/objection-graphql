@@ -333,6 +333,8 @@ describe('integration tests', () => {
             orderBy: 'order_by',
             orderByDesc: 'order_by_desc',
             range: 'range',
+            limit: 'limit',
+            offset: 'offset'
           })
           .build();
 
@@ -648,6 +650,21 @@ describe('integration tests', () => {
           age: 73,
         }]);
       }));
+
+      it('limit should limit the records returned', () => graphql(schema, '{ people(limit: 1) { firstName, age} }').then((res) => {
+        expect(res.data.people).to.eql([{
+          firstName: 'Gustav',
+          age: 98,
+        }]);
+      }));
+
+      it('offset should offset the point from which the records are returned', () => graphql(schema, '{ people(offset: 3, orderByDesc: firstName) { firstName, age} }').then((res) => {
+        expect(res.data.people).to.eql([{
+          firstName: 'Arnold',
+          age: 73,
+        }]);
+      }));
+
 
       it('jsonSchema enums should be usable as GraphQL enums', () => graphql(schema, '{ people(gender: Male) { firstName } }').then((res) => {
         expect(res.data.people).to.eql([{
