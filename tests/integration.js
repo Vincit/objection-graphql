@@ -11,9 +11,7 @@ const mainModule = require('../');
 const models = require('./setup/models');
 const IntegrationTestSession = require('./setup/IntegrationTestSession');
 
-const sortByPropAccessor = (accessor) => (first, second) => {
-  return first[accessor].localeCompare(second[accessor]);
-}
+const sortByPropAccessor = accessor => (first, second) => first[accessor].localeCompare(second[accessor]);
 
 const sortByFirstName = sortByPropAccessor('firstName');
 const sortByName = sortByPropAccessor('name');
@@ -134,7 +132,7 @@ describe('integration tests', () => {
       return graphql(schema, '{ people { firstName } }', {
         knex: session.knex,
       }).then((res) => {
-        const people = res.data.people;
+        const { data: { people } } = res;
         people.sort(sortByFirstName);
 
         expect(people).to.eql([
@@ -149,7 +147,7 @@ describe('integration tests', () => {
           },
           {
             firstName: 'Some',
-          }
+          },
         ]);
       });
     });
@@ -173,7 +171,7 @@ describe('integration tests', () => {
     });
 
     it('root should have `people` field', () => graphql(schema, '{ people { firstName } }').then((res) => {
-      const people = res.data.people;
+      const { data: { people } } = res;
       people.sort(sortByFirstName);
 
       expect(people).to.eql([
@@ -193,7 +191,7 @@ describe('integration tests', () => {
     }));
 
     it('root should have `movies` field', () => graphql(schema, '{ movies(orderByDesc: name) { name } }').then((res) => {
-      const movies = res.data.movies;
+      const { data: { movies } } = res;
       movies.sort(sortByName);
 
       expect(movies).to.eql([
@@ -218,7 +216,7 @@ describe('integration tests', () => {
     }));
 
     it('`people` field should have all properties defined in the Person model\'s jsonSchema', () => graphql(schema, '{ people { age, gender, firstName, lastName, parentId, addresses { street, city, zipCode } } }').then((res) => {
-      const people = res.data.people;
+      const { data: { people } } = res;
       people.sort(sortByFirstName);
 
       expect(people).to.eql([
@@ -286,7 +284,7 @@ describe('integration tests', () => {
           .build();
 
         return graphql(schema, '{ people { firstName, lastName, fullName } }').then((res) => {
-          const people = res.data.people;
+          const { data: { people } } = res;
           people.sort(sortByFirstName);
 
           expect(people).to.eql([
@@ -373,7 +371,7 @@ describe('integration tests', () => {
             orderByDesc: 'order_by_desc',
             range: 'range',
             limit: 'limit',
-            offset: 'offset'
+            offset: 'offset',
           })
           .build();
 
@@ -514,55 +512,55 @@ describe('integration tests', () => {
             }
           }
         }`, {
-          onQuery(builder) {
-            builder.eagerAlgorithm(session.models.Person.JoinEagerAlgorithm);
-          },
-        }).then((res) => {
-          const terminator = _.find(res.data.movies, { name: 'The terminator' });
-          terminator.actors.sort(sortByFirstName);
-          terminator.actors[0].movies.sort(sortByName);
-          terminator.reviews.sort(sortByTitle);
+        onQuery(builder) {
+          builder.eagerAlgorithm(session.models.Person.JoinEagerAlgorithm);
+        },
+      }).then((res) => {
+        const terminator = _.find(res.data.movies, { name: 'The terminator' });
+        terminator.actors.sort(sortByFirstName);
+        terminator.actors[0].movies.sort(sortByName);
+        terminator.reviews.sort(sortByTitle);
 
-          expect(terminator).to.eql({
-            name: 'The terminator',
-            actors: [{
-              firstName: 'Arnold',
+        expect(terminator).to.eql({
+          name: 'The terminator',
+          actors: [{
+            firstName: 'Arnold',
 
-              movies: [{
-                name: 'Predator',
-              },
-              {
-                name: 'Terminator 2: Judgment Day',
-              },
-              {
-                name: 'The terminator',
-              },
-              ],
-            }, {
-              firstName: 'Michael',
+            movies: [{
+              name: 'Predator',
+            },
+            {
+              name: 'Terminator 2: Judgment Day',
+            },
+            {
+              name: 'The terminator',
+            },
+            ],
+          }, {
+            firstName: 'Michael',
 
-              movies: [{
-                name: 'The terminator',
-              }],
+            movies: [{
+              name: 'The terminator',
             }],
+          }],
 
-            reviews: [
-              {
-                title: 'Changed my mind',
+          reviews: [
+            {
+              title: 'Changed my mind',
 
-                reviewer: {
-                  firstName: 'Some',
-                },
+              reviewer: {
+                firstName: 'Some',
               },
-              {
-                title: 'Great movie',
+            },
+            {
+              title: 'Great movie',
 
-                reviewer: {
-                  firstName: 'Some',
-                },
-              },],
-          });
-        }));
+              reviewer: {
+                firstName: 'Some',
+              },
+            }],
+        });
+      }));
     });
 
 
@@ -588,7 +586,7 @@ describe('integration tests', () => {
       }));
 
       it('adding \'Lt\' after a property name should create a `<` filter', () => graphql(schema, '{ people(ageLt: 73) { firstName } }').then((res) => {
-        const people = res.data.people;
+        const { data: { people } } = res;
         people.sort(sortByFirstName);
 
         expect(people).to.eql([{
@@ -599,7 +597,7 @@ describe('integration tests', () => {
       }));
 
       it('adding \'Lte\' after a property name should create a `<=` filter', () => graphql(schema, '{ people(ageLte: 73) { firstName } }').then((res) => {
-        const people = res.data.people;
+        const { data: { people } } = res;
         people.sort(sortByFirstName);
 
         expect(people).to.eql([
@@ -616,7 +614,7 @@ describe('integration tests', () => {
       }));
 
       it('adding \'Like\' after a property name should create a `like` filter', () => graphql(schema, '{ people(lastNameLike: "%egg%") { firstName } }').then((res) => {
-        const people = res.data.people;
+        const { data: { people } } = res;
         people.sort(sortByFirstName);
 
         expect(people).to.eql([
@@ -630,7 +628,7 @@ describe('integration tests', () => {
       }));
 
       it('adding \'LikeNoCase\' after a property name should create a case insensitive `like` filter', () => graphql(schema, '{ people(lastNameLikeNoCase: "sch%") { firstName } }').then((res) => {
-        const people = res.data.people;
+        const { data: { people } } = res;
         people.sort(sortByFirstName);
 
         expect(people).to.eql([
@@ -644,7 +642,7 @@ describe('integration tests', () => {
       }));
 
       it('adding \'In\' after a property name should create an `in` filter', () => graphql(schema, '{ people(ageIn: [45, 98]) { firstName } }').then((res) => {
-        const people = res.data.people;
+        const { data: { people } } = res;
         people.sort(sortByFirstName);
 
         expect(people).to.eql([{
@@ -655,7 +653,7 @@ describe('integration tests', () => {
       }));
 
       it('adding \'NotIn\' after a property name should create an `not in` filter', () => graphql(schema, '{ people(ageNotIn: [45, 98]) { firstName } }').then((res) => {
-        const people = res.data.people;
+        const { data: { people } } = res;
         people.sort(sortByFirstName);
 
         expect(res.data.people).to.eql([
@@ -664,11 +662,11 @@ describe('integration tests', () => {
           },
           {
             firstName: 'Some',
-          },]);
+          }]);
       }));
 
       it('adding \'IsNull: true\' after a property name should create an `is null` filter', () => graphql(schema, '{ people(parentIdIsNull: true) { firstName } }').then((res) => {
-        const people = res.data.people;
+        const { data: { people } } = res;
         people.sort(sortByFirstName);
 
         expect(people).to.eql([{
@@ -687,7 +685,6 @@ describe('integration tests', () => {
       }));
 
       it('orderBy should order by the given property', () => graphql(schema, '{ people(orderBy: age) { firstName, age } }').then((res) => {
-
         expect(res.data.people).to.eql([{
           firstName: 'Some',
           age: 20,
@@ -745,7 +742,7 @@ describe('integration tests', () => {
 
 
       it('jsonSchema enums should be usable as GraphQL enums', () => graphql(schema, '{ people(gender: Male) { firstName } }').then((res) => {
-        const people = res.data.people;
+        const { data: { people } } = res;
         people.sort(sortByFirstName);
 
         expect(people).to.eql([
