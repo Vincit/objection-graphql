@@ -131,7 +131,7 @@ const graphQlSchema = graphQlBuilder()
 # Extending your schema with mutations
 
 Often you need to provide mutations in your GraphQL schema. At the same time mutations can be quite opinionated with side effects and complex business logic, so plain CUD implementation is not always a good idea. 
-Therefore we provide a method `extendWithMutations` which allows you to extend the generated query schema with mutations. You can provide a root `GraphQLObjectType` or function as a first argument for this method. 
+Therefore we provide a method `extendWithMutations` which allows you to extend the generated query schema with mutations. You can provide a root `GraphQLObjectType` or a function as a first argument for this method. 
 Function in this case plays as a strategy which receives current builder as a first argument and returns `GraphQLObjectType`. 
 
 ```js
@@ -158,7 +158,7 @@ const personType = new GraphQLObjectType({
 
 const createPersonInputType = new GraphQLInputObjectType({
     name: 'CreatePersonType',
-    description: 'Use this object to create new person',
+    description: 'Person',
     fields: () => ({
       firstName: {
         type: new GraphQLNonNull(GraphQLString),
@@ -172,24 +172,24 @@ const createPersonInputType = new GraphQLInputObjectType({
 });
     
 const mutationType = new GraphQLObjectType({
-     name: 'RootMutationType',
-     description: 'Domain API actions',
-     fields: () => ({
-       createPerson: {
-         description: 'Creates a new person',
-         type: personType,
-         args: {
-           input: { type: new GraphQLNonNull(createPersonInputType) },
-         },
-         resolve: (root, inputPerson) => {
-           const { firstName, lastName } = inputPerson.input;
-           return {
+    name: 'RootMutationType',
+    description: 'Domain API actions',
+    fields: () => ({
+      createPerson: {
+        description: 'Creates a new person',
+        type: personType,
+        args: {
+          input: { type: new GraphQLNonNull(createPersonInputType) },
+        },
+        resolve: (root, inputPerson) => {
+          const { firstName, lastName } = inputPerson.input;
+          return {
               id: 1,
               firstName,
               lastName,
-           };
-         },
-       },
+          };
+        },
+      },
     }),
 });
 
@@ -200,8 +200,57 @@ schema = mainModule
   .extendWithMutations(mutationType)
   .build();    
 ```
-   
 
+# Extending your schema with subscriptions
+
+When you want to implement a real-time behavior in your app like push notifications, you basically have two options in graphql: subscriptions and live queries. The first approach is focused on events and granular control over updates, while the other is based on smart live queries, where most of real-rime magic is hidden from the client. We'd like to stick with the first approach since there are some decent implementations out there like [graphql-subscriptions](https://github.com/apollographql/graphql-subscriptions) by Apollo.
+
+The implementation is similar to mutations extention point: you've got an `extendWithSubscriptions` method where you can pass the root `GraphQLObjectType` or a function which can bahave as a strategy which receives current builder as an argument. 
+
+```js
+//...
+import { PubSub } from 'graphql-subscriptions';
+const pubsub = new PubSub();
+//...
+const personType = new GraphQLObjectType({
+    name: 'PersonType',
+    description: 'Person',
+    fields: () => ({
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: 'First Name',
+      },
+      firstName: {
+        type: new GraphQLNonNull(GraphQLString),
+        description: 'First Name',
+      },
+      lastName: {
+        type: new GraphQLNonNull(GraphQLString),
+        description: 'Last Name',
+      },
+    }),
+});
+
+const subscriptionType = new GraphQLObjectType({
+    name: 'RootSubscriptionType',
+    description: 'Domain subscriptions',
+    fields: () => ({
+      personCreated: {
+        description: 'A new person created',
+        type: personType,
+        resolve: (payload: any) => payload,
+        subscribe: () => pubsub.asyncIterator('PERSON_CREATED'),
+      },
+    }),
+});
+
+//Here you can use a GraphQLObjectType or function as an argument for extendWithSubscriptions
+schema = mainModule
+  .builder()
+  .model(Person)
+  .extendWithSubscriptions(subscriptionType)
+  .build();  
+```
 # Misc
 
 ## defaultArgNames
