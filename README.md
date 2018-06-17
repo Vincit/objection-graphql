@@ -27,6 +27,10 @@ const graphQlSchema = graphQlBuilder()
   .model(Review)
   .build();
 
+// Or: 
+// const models = [Movie, Person, Review]
+// const graphQlSchema = graphQlBuilder().allModels(models).build();
+
 // Execute a GraphQL query.
 graphql(graphQlSchema, `{
   movies(nameLike: "%erminato%", range: [0, 2], orderBy: releaseDate) {
