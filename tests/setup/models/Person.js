@@ -30,6 +30,7 @@ class Person extends Model {
         parentId: { type: ['integer', 'null'] },
         firstName: { type: 'string', minLength: 1, maxLength: 255 },
         lastName: { type: 'string', minLength: 1, maxLength: 255 },
+        birthYear: { type: ['string', 'null'] },
         fullName: { type: 'string' },
         gender: { type: 'string', enum: _.values(Person.Gender) },
         age: { type: ['number', 'null'] },

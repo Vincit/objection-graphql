@@ -263,6 +263,7 @@ describe('integration tests', () => {
       ]);
     }));
 
+
     it('`people` field should have all properties defined in the Person model\'s jsonSchema, plus virtual properties', () => graphql(schema, '{ people { age, birthYear, gender, firstName, lastName, parentId, addresses { street, city, zipCode } } }').then((res) => {
       console.log(res);
       const { data: { people } } = res;
