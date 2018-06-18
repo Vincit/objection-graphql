@@ -14,6 +14,12 @@ class Person extends Model {
     };
   }
 
+  static get virtualJsonSchemaProperties() {
+    return {
+      birthYear: { type: ['number', 'null'] },
+    };
+  }
+
   static get jsonSchema() {
     return {
       type: 'object',
@@ -24,6 +30,7 @@ class Person extends Model {
         parentId: { type: ['integer', 'null'] },
         firstName: { type: 'string', minLength: 1, maxLength: 255 },
         lastName: { type: 'string', minLength: 1, maxLength: 255 },
+        birthYear: { type: ['string', 'null'] },
         fullName: { type: 'string' },
         gender: { type: 'string', enum: _.values(Person.Gender) },
         age: { type: ['number', 'null'] },
@@ -90,7 +97,11 @@ class Person extends Model {
   }
 
   static get virtualAttributes() {
-    return ['fullName'];
+    return ['fullName', 'birthYear'];
+  }
+
+  birthYear() {
+    return this.age ? (2018 - this.age) : null;
   }
 
   fullName() {
