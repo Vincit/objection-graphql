@@ -1,0 +1,119 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`User Access Control Alice should be able to fetch users from api 1`] = `
+Array [
+  Object {
+    "id": 1,
+    "username": "Alice",
+  },
+  Object {
+    "id": 2,
+    "username": "Bob",
+  },
+  Object {
+    "id": 3,
+    "username": "Eve",
+  },
+]
+`;
+
+exports[`User Access Control Alice should be not be able to see the passwords of others 1`] = `
+Array [
+  Object {
+    "id": 1,
+    "password": "alice",
+    "username": "Alice",
+  },
+  Object {
+    "id": 2,
+    "password": null,
+    "username": "Bob",
+  },
+  Object {
+    "id": 3,
+    "password": null,
+    "username": "Eve",
+  },
+]
+`;
+
+exports[`User Access Control Alice should be not be able to see the passwords of others 2`] = `
+Array [
+  Object {
+    "id": 1,
+    "password": "alice",
+    "username": "Alice",
+  },
+  Object {
+    "id": 2,
+    "password": null,
+    "username": "Bob",
+  },
+  Object {
+    "id": 3,
+    "password": null,
+    "username": "Eve",
+  },
+]
+`;
+
+exports[`User Access Control Alice should not be able to tunnel through project to see password 1`] = `
+Array [
+  Object {
+    "id": 1,
+    "owner": Object {
+      "id": 1,
+      "password": "alice",
+      "username": "Alice",
+    },
+  },
+]
+`;
+
+exports[`User Access Control Alice should not be able to tunnel through user to see project 1`] = `
+Array [
+  Object {
+    "id": 1,
+    "projects": Array [
+      Object {
+        "id": 1,
+        "title": "Project by Alice",
+      },
+    ],
+  },
+  Object {
+    "id": 2,
+    "projects": Array [],
+  },
+  Object {
+    "id": 3,
+    "projects": Array [],
+  },
+]
+`;
+
+exports[`User Access Control Alice should only be able to see their project 1`] = `
+Array [
+  Object {
+    "id": 1,
+    "title": "Project by Alice",
+  },
+]
+`;
+
+exports[`User Access Control should have our 3 users in the db 1`] = `
+Array [
+  Object {
+    "password": "alice",
+    "username": "Alice",
+  },
+  Object {
+    "password": "bob",
+    "username": "Bob",
+  },
+  Object {
+    "password": "eve",
+    "username": "Eve",
+  },
+]
+`;

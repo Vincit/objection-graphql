@@ -1,0 +1,31 @@
+{
+  "extends": "airbnb-base",
+  "globals": {
+    "describe": false,
+    "it": false,
+    "beforeAll": false,
+    "beforeEach": false,
+    "expect": false
+  },
+  "env": {
+    "node": true
+  },
+  "plugins": [
+    "import"
+  ],
+  "rules": {
+    "no-param-reassign": [0],
+    "radix": "off",
+    "no-continue": "off",
+    "no-use-before-define": "off",
+    "no-underscore-dangle": "off",
+    "class-methods-use-this": "off",
+    "max-len": ["error", 150, 2, {
+      "ignoreUrls": true,
+      "ignoreComments": false,
+      "ignoreRegExpLiterals": true,
+      "ignoreStrings": true,
+      "ignoreTemplateLiterals": true
+    }]
+  }
+}
