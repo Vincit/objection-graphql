@@ -263,59 +263,6 @@ describe('integration tests', () => {
       ]);
     }));
 
-    it('`people` field should have all properties defined in the Person model\'s jsonSchema, plus virtual properties', () => graphql(schema, '{ people { age, birthYear, gender, firstName, lastName, parentId, addresses { street, city, zipCode } } }').then((res) => {
-      console.log(res);
-      const { data: { people } } = res;
-      people.sort(sortByFirstName);
-
-      expect(people).to.eql([
-        {
-          age: 73,
-          birthYear: 1945,
-          firstName: 'Arnold',
-          lastName: 'Schwarzenegger',
-          gender: 'Male',
-          parentId: 1,
-          addresses: [{
-            street: 'Arnoldlane 12',
-            city: 'Arnoldova',
-            zipCode: '123456',
-          }],
-        },
-        {
-          age: 98,
-          birthYear: 1920,
-          firstName: 'Gustav',
-          lastName: 'Schwarzenegger',
-          gender: 'Male',
-          parentId: null,
-          addresses: [{
-            street: 'Gustavroad 64',
-            city: 'Gustavia',
-            zipCode: '654321',
-          }],
-        },
-        {
-          age: 45,
-          birthYear: 1973,
-          firstName: 'Michael',
-          lastName: 'Biehn',
-          gender: 'Male',
-          parentId: null,
-          addresses: null,
-        },
-        {
-          age: 20,
-          birthYear: 1998,
-          firstName: 'Some',
-          lastName: 'Random-Dudette',
-          gender: 'Female',
-          parentId: null,
-          addresses: null,
-        },
-      ]);
-    }));
-
     it('should work with the meta field `__typename`', () => graphql(schema, '{ reviews { title, __typename } }').then((res) => {
       expect(res.data.reviews).to.eql([{
         __typename: 'Review',

@@ -14,12 +14,6 @@ class Person extends Model {
     };
   }
 
-  static get virtualJsonSchemaProperties() {
-    return {
-      birthYear: { type: ['number', 'null'] },
-    };
-  }
-
   static get jsonSchema() {
     return {
       type: 'object',
@@ -96,11 +90,7 @@ class Person extends Model {
   }
 
   static get virtualAttributes() {
-    return ['fullName', 'birthYear'];
-  }
-
-  birthYear() {
-    return this.age ? (2018 - this.age) : null;
+    return ['fullName'];
   }
 
   fullName() {
