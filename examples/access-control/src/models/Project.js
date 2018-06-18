@@ -12,18 +12,8 @@ module.exports = class Project extends BaseModel {
     };
   }
 
-  static get QueryBuilder() {
-    return class extends super.QueryBuilder {
-      constructor(modelClass) {
-        super(modelClass);
-        this.runBefore(async (results, qb) => {
-          const { userId, isApiQuery } = qb.context();
-          if (isApiQuery) {
-            qb.where('ownerId', userId);
-          }
-        });
-      }
-    };
+  static async modifyApiQuery(qb, { userId }) {
+    qb.where('ownerId', userId);
   }
 
   static get relationMappings() {

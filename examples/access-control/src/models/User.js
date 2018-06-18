@@ -13,21 +13,11 @@ module.exports = class User extends BaseModel {
     };
   }
 
-  static get QueryBuilder() {
-    return class extends super.QueryBuilder {
-      constructor(modelClass) {
-        super(modelClass);
-        this.runAfter(async (results, qb) => {
-          const { userId, isApiQuery } = qb.context();
-          if (isApiQuery) {
-            results.forEach((result) => {
-              if (result.id !== userId) delete result.password;
-            });
-          }
-          return results;
-        });
-      }
-    };
+  static async modifyApiResults(results, { userId }) {
+    results.forEach((result) => {
+      if (result.id !== userId) delete result.password;
+    });
+    return results;
   }
 
   static get relationMappings() {
