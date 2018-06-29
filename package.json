@@ -1,6 +1,6 @@
 {
   "name": "objection-graphql",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Automatically generates GraphQL schema for objection.js models and allows to extend the schema with custom mutations and subscriptions",
   "main": "objection-graphql.js",
   "scripts": {
