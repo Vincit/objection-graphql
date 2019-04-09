@@ -1259,6 +1259,61 @@ describe('integration tests', () => {
     });
   });
 
+  describe('Schema with auth middleware', () => {
+    let schema;
+
+    before(() => {
+      const mutationsBuilder = () => mutationType;
+
+      const authMW = (callback, modelData) => {
+        const { modelClass } = modelData;
+        return (obj, args, context, info) => {
+          if (modelClass.needAuth) { // You can define in model somethig like roles and check it here
+            if (!context) { // check your own context property
+              throw new Error('Access denied');
+            } 
+          }
+          return callback(obj, args, context, info);
+        };
+      }
+
+      schema = mainModule
+        .builder()
+        .model(session.models.Person)
+        .model(session.models.Movie)
+        .extendWithAuthMiddleware(authMW)
+        .build();
+    });
+
+    it('does not allow to access person entity (needAuth true)', () => {
+      const query = `
+        query {
+          persons {
+             firstName
+          }
+      }`;
+
+      return graphql(schema, query).then((res) => {
+        expect(res.errors[0].message).to.eql('Access denied');
+      });
+    });
+
+    it('allows to access movie entity (needAuth false)', () => {
+      const query = `
+        query {
+          movie(id: 1) {
+             name
+          }
+      }`;
+
+      return graphql(schema, query).then((res) => {
+        expect(res.data.movie).to.eql({
+          name: 'The terminator',
+        });
+      });
+    });
+  });
+
   describe('builder options', () => {
     let schema;
 

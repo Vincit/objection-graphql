@@ -7,6 +7,10 @@ class Person extends Model {
     return 'Person';
   }
 
+  static get needAuth() {
+    return true;
+  }
+
   static get Gender() {
     return {
       Male: 'Male',
