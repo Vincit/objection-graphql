@@ -1281,7 +1281,7 @@ describe('integration tests', () => {
         .builder()
         .model(session.models.Person)
         .model(session.models.Movie)
-        .extendWithAuthMiddleware(authMW)
+        .extendWithMiddleware(authMW)
         .build();
     });
 
