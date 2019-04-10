@@ -1,6 +1,6 @@
 {
   "name": "objection-graphql",
-  "version": "0.4.2",
+  "version": "0.4.4",
   "description": "Automatically generates GraphQL schema for objection.js models and allows to extend the schema with custom mutations and subscriptions",
   "main": "objection-graphql.js",
   "scripts": {
@@ -35,7 +35,7 @@
     "objection": "> 0.8.0"
   },
   "dependencies": {
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.11"
   },
   "devDependencies": {
     "eslint": "^4.16.0",
@@ -47,6 +47,6 @@
     "knex": "^0.14.6",
     "mocha": "^3.4.2",
     "objection": "^1.1.7",
-    "sqlite3": "^4.0.0"
+    "sqlite3": "^4.0.4"
   }
 }
