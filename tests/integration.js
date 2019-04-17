@@ -1336,4 +1336,34 @@ describe('integration tests', () => {
       });
     }));
   });
+
+  describe('get singular and plural names from jsonSchema', () => {
+    let schema;
+
+    before(() => {
+      const { Model } = require('objection');
+      class Human extends Model {
+        static get tableName() { return 'humans' }
+        static get jsonSchema() {
+          return {
+            type: 'object',
+            singleName: 'person',
+            collectiveName: 'mankind',
+            properties: { id: { type: 'integer' }}
+          }
+        }
+      }
+      schema = mainModule
+        .builder()
+        .model(Human)
+        .build();
+    });
+
+    it('has a correct type name', () => {
+      const fields = schema._queryType._fields
+      expect(fields.person.type).to.be.a(GraphQLObjectType);
+      expect(fields.mankind.type).to.be.a(GraphQLList);
+    });
+  });
+
 });
