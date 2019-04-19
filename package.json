@@ -35,6 +35,7 @@
     "objection": "> 0.8.0"
   },
   "dependencies": {
+    "graphql-type-json": "^0.3.0",
     "lodash": "^4.17.11"
   },
   "devDependencies": {
