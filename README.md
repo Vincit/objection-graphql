@@ -337,4 +337,49 @@ expressApp.get('/graphql', (req, res, next) => {
 ## setBuilderOptions
 
 Allows you to customize **Objection** query builder behavior. For instance, you can pass `{ skipUndefined: true }` as an options argument. So, each time the builder is called, it will be called with **skipUndefined** enabled. 
-This can be useful when you use [graphql-tools](https://github.com/apollographql/graphql-tools) schema stitching. 
+This can be useful when you use [graphql-tools](https://github.com/apollographql/graphql-tools) schema stitching.
+
+## Pagination
+
+In many cases it is useful to have a total record count to use with pagination.
+If you pass `true` to the `build()` function all list queries will be 
+structured with a `collection` and a `totalCount` field.  For example:
+```js
+const graphQlSchema = graphQlBuilder()
+  .model(Movie)
+  .model(Person)
+  .model(Review)
+  .build(true); // passing in true to get pagination
+``` 
+allows you to do:
+```js
+// Execute a GraphQL query.
+graphql(graphQlSchema, `{
+  movies {
+    collection(nameLike: "%erminato%", range: [0, 2], orderBy: releaseDate) {
+      name,
+      releaseDate,
+      
+      actors(gender: Male, ageLte: 100, orderBy: firstName) {
+        id
+        firstName,
+        age
+      }
+      
+      reviews(starsIn: [3, 4, 5], orderByDesc: stars) {
+        title,
+        text,
+        stars,
+        
+        reviewer {
+          firstName
+        }
+      }
+    },
+  totalCount
+}`).then(result => {
+  console.log(result.data.movies);
+});
+```
+Note the addition of the `collection` and ``totalCount` fields in the 
+GraphQL query.
