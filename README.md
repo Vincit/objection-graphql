@@ -147,7 +147,7 @@ const personType = new GraphQLObjectType({
     fields: () => ({
       id: {
         type: new GraphQLNonNull(GraphQLInt),
-        description: 'First Name',
+        description: 'Id',
       },
       firstName: {
         type: new GraphQLNonNull(GraphQLString),
