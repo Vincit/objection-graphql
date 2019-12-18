@@ -342,14 +342,15 @@ This can be useful when you use [graphql-tools](https://github.com/apollographql
 ## Pagination
 
 In many cases it is useful to have a total record count to use with pagination.
-If you pass `true` to the `build()` function all list queries will be 
+If you pass `{ paginated: true }` to the `setBuilderOptions` function all list queries will be 
 structured with a `collection` and a `totalCount` field.  For example:
 ```js
 const graphQlSchema = graphQlBuilder()
   .model(Movie)
   .model(Person)
   .model(Review)
-  .build(true); // passing in true to get pagination
+  .setBuilderOptions({ paginated: true })
+  .build(); 
 ``` 
 allows you to do:
 ```js

@@ -864,7 +864,8 @@ describe('integration tests', () => {
         .model(session.models.Person, {listFieldName: 'people'})
         .model(session.models.Movie)
         .model(session.models.Review)
-        .build(true);
+        .setBuilderOptions({ paginated: true })
+        .build();
     });
 
     it('root should have `totalCount` field', () => graphql(schema, '{ people { collection { firstName }, totalCount } }').then((res) => {
