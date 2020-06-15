@@ -265,7 +265,7 @@ describe('integration tests', () => {
 
 
     it('`people` field should have all properties defined in the Person model\'s jsonSchema, plus virtual properties', () => graphql(schema, '{ people { age, birthYear, gender, firstName, lastName, parentId, addresses { street, city, zipCode } } }').then((res) => {
-      console.log(res);
+      // console.log(res);
       const { data: { people } } = res;
       people.sort(sortByFirstName);
 
@@ -548,18 +548,14 @@ describe('integration tests', () => {
       it('should be able to fetch nested relations using JoinEagerAlgorithm', () => graphql(schema, `{
           movies {
             name,
-
             actors {
               firstName,
-
               movies {
                 name
               }
             },
-
             reviews {
               title,
-
               reviewer {
                 firstName
               }
@@ -853,6 +849,45 @@ describe('integration tests', () => {
         }));
       });
     });
+  });
+
+  describe('list fields with pagination', () => {
+    let schema;
+
+    beforeEach(() => {
+      schema = mainModule
+        .builder()
+        .model(session.models.Person, {listFieldName: 'people'})
+        .model(session.models.Movie)
+        .model(session.models.Review)
+        .setBuilderOptions({ paginated: true })
+        .build();
+    });
+
+    it('root should have `totalCount` field', () => graphql(schema, '{ people { collection { firstName }, totalCount } }').then((res) => {
+      const { data: { people: { totalCount } } } = res;
+      expect(totalCount).to.eql(4);
+    }));
+
+    it('root should have `people` field', () => graphql(schema, '{ people { collection { firstName } }}').then((res) => {
+      const { data: { people: { collection } } } = res;
+      collection.sort(sortByFirstName);
+
+      expect(collection).to.eql([
+        {
+          firstName: 'Arnold',
+        },
+        {
+          firstName: 'Gustav',
+        },
+        {
+          firstName: 'Michael',
+        },
+        {
+          firstName: 'Some',
+        },
+      ]);
+    }));
   });
 
   describe('single fields', () => {
@@ -1271,7 +1306,7 @@ describe('integration tests', () => {
           if (modelClass.needAuth) { // You can define in model somethig like roles and check it here
             if (!context) { // check your own context property
               throw new Error('Access denied');
-            } 
+            }
           }
           return callback(obj, args, context, info);
         };
